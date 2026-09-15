@@ -1,0 +1,47 @@
+.confirmation-page {
+  max-width: 560px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.confirmation-page h1 {
+  font-size: 3.2rem;
+  margin-top: 8px;
+}
+
+.confirmation-order-number {
+  font-weight: 700;
+  color: var(--rose-pink-hover);
+  font-size: 1.6rem;
+}
+
+.confirmation-sub {
+  color: var(--text-muted);
+  margin: 12px 0 24px;
+}
+
+.confirmation-details {
+  width: 100%;
+  background: var(--bg-elev);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+  text-align: left;
+  margin-bottom: 28px;
+}
+
+.confirmation-items {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.confirmation-address {
+  margin-top: 12px;
+  color: var(--text-muted);
+  font-size: 1.3rem;
+}

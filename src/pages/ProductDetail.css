@@ -1,0 +1,134 @@
+.product-detail {
+  display: grid;
+  gap: 32px;
+  grid-template-columns: 1fr;
+}
+
+.product-detail-main-image {
+  aspect-ratio: 1 / 1;
+  background: var(--soft-pink);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.product-detail-main-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.product-detail-thumbs {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.product-detail-thumb {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 2px solid transparent;
+  padding: 0;
+  background: var(--soft-pink);
+}
+
+.product-detail-thumb.is-active {
+  border-color: var(--rose-pink);
+}
+
+.product-detail-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.product-detail-info h1 {
+  font-size: 2.8rem;
+  margin: 6px 0 12px;
+}
+
+.product-detail-description {
+  margin-top: 16px;
+  color: var(--text-muted);
+  font-size: 1.4rem;
+  line-height: 1.7;
+}
+
+.field-label {
+  font-weight: 600;
+  font-size: 1.3rem;
+  color: var(--brown);
+  margin-bottom: 8px;
+}
+
+.product-detail-sizes {
+  margin-top: 24px;
+}
+
+.size-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.size-pill {
+  min-width: 44px;
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border);
+  background: var(--bg-elev);
+  color: var(--brown);
+  font-weight: 600;
+}
+
+.size-pill.is-active {
+  background: var(--brown);
+  border-color: var(--brown);
+  color: #fff;
+}
+
+.product-detail-qty {
+  margin-top: 24px;
+}
+
+.qty-stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  border: 1.5px solid var(--border);
+  border-radius: 999px;
+  padding: 6px 16px;
+}
+
+.qty-stepper button {
+  background: none;
+  border: none;
+  color: var(--brown);
+  display: flex;
+}
+
+.qty-stepper span {
+  min-width: 20px;
+  text-align: center;
+  font-weight: 700;
+}
+
+.product-detail-add {
+  margin-top: 32px;
+  width: 100%;
+}
+
+.product-detail-view-cart {
+  margin-top: 12px;
+  width: 100%;
+}
+
+@media (min-width: 800px) {
+  .product-detail {
+    grid-template-columns: 1fr 1fr;
+  }
+}

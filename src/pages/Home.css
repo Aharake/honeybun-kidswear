@@ -1,0 +1,73 @@
+.hero {
+  text-align: center;
+  padding: 40px 0 32px;
+}
+
+.hero-eyebrow {
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: var(--rose-pink-hover);
+}
+
+.hero-title {
+  margin-top: 16px;
+  font-size: 4.2rem;
+  line-height: 1.15;
+}
+
+.hero-sub {
+  margin: 20px auto 0;
+  max-width: 520px;
+  color: var(--text-muted);
+  font-size: 1.6rem;
+}
+
+.hero-cta {
+  margin-top: 28px;
+}
+
+.home-categories {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px 0 48px;
+}
+
+.category-pill {
+  background: var(--soft-pink);
+  color: var(--brown);
+  font-weight: 600;
+  font-size: 1.4rem;
+  padding: 10px 22px;
+  border-radius: 999px;
+  transition: background 0.15s var(--ease);
+}
+
+.category-pill:hover {
+  background: var(--blush-pink);
+  opacity: 1;
+}
+
+.home-featured {
+  padding: 24px 0 60px;
+}
+
+.home-featured h2 {
+  font-size: 2.4rem;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.home-empty {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 40px 0;
+}
+
+@media (min-width: 960px) {
+  .hero-title {
+    font-size: 5.2rem;
+  }
+}

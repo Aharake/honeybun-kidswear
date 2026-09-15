@@ -1,0 +1,228 @@
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Quicksand:wght@400;500;600;700&display=swap');
+
+html {
+  font-size: 62.5%;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+:root {
+  --cream: #FFF9F4;
+  --brown: #6B4F3A;
+  --blush-pink: #F7D7D6;
+  --dusty-blue: #A7B8C6;
+  --warm-beige: #EADCC8;
+
+  --soft-pink: #FDECEF;
+  --taupe: #C9B8A7;
+  --sage-green: #B7C4A7;
+  --lavender: #DCCDEB;
+  --sky-blue: #D6E8F6;
+
+  --dark-brown: #4A3A2E;
+  --gray: #8D8D8D;
+  --light-gray: #E6E6E6;
+  --off-white: #F8F8F8;
+
+  --rose-pink: #E8A7B3;
+  --rose-pink-hover: #DD8FA0;
+  --blue-gray: #8FA8C9;
+  --mustard: #F3D9A6;
+  --sage: #96B48F;
+
+  --bg: var(--cream);
+  --bg-elev: #FFFFFF;
+  --bg-soft: var(--soft-pink);
+  --border: var(--light-gray);
+  --text: var(--dark-brown);
+  --text-muted: var(--gray);
+  --text-on-accent: #FFFFFF;
+
+  --font-display: 'Fredoka', 'Quicksand', system-ui, sans-serif;
+  --font-sans: 'Quicksand', system-ui, sans-serif;
+
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --shadow-sm: 0 2px 8px rgba(74, 58, 46, 0.08);
+  --shadow-md: 0 8px 24px rgba(74, 58, 46, 0.10);
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  font-family: var(--font-sans);
+  line-height: 1.5;
+  font-weight: 500;
+  color: var(--text);
+  background-color: var(--bg);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  max-width: 100vw;
+  background-color: var(--bg);
+  color: var(--text);
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--dark-brown);
+  margin: 0;
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: var(--blue-gray);
+  text-decoration: none;
+}
+
+a:hover {
+  opacity: 0.8;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+input, textarea, select {
+  font-family: inherit;
+  font-size: 1.4rem;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 999px;
+  border: none;
+  padding: 12px 24px;
+  font-size: 1.4rem;
+  font-weight: 600;
+  transition: transform 0.15s var(--ease), background-color 0.15s var(--ease), opacity 0.15s var(--ease);
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn-primary {
+  background-color: var(--rose-pink);
+  color: var(--text-on-accent);
+}
+
+.btn-primary:hover {
+  background-color: var(--rose-pink-hover);
+}
+
+.btn-secondary {
+  background-color: var(--bg-elev);
+  color: var(--brown);
+  border: 1.5px solid var(--border);
+}
+
+.btn-secondary:hover {
+  border-color: var(--taupe);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.page {
+  flex: 1;
+  padding: 40px 0 80px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.badge-pending { background: var(--mustard); color: var(--dark-brown); }
+.badge-confirmed { background: var(--sky-blue); color: var(--dark-brown); }
+.badge-shipped { background: var(--lavender); color: var(--dark-brown); }
+.badge-delivered { background: var(--sage); color: #fff; }
+.badge-cancelled { background: var(--blush-pink); color: var(--dark-brown); }
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field label {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--brown);
+}
+
+.field input,
+.field textarea,
+.field select {
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border);
+  background: var(--bg-elev);
+  color: var(--text);
+}
+
+.field input:focus,
+.field textarea:focus,
+.field select:focus {
+  outline: none;
+  border-color: var(--blue-gray);
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+@media (min-width: 640px) {
+  .product-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 960px) {
+  .product-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}

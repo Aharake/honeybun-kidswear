@@ -1,0 +1,38 @@
+.contact-page {
+  max-width: 640px;
+  text-align: center;
+}
+
+.contact-page h1 {
+  font-size: 3.2rem;
+}
+
+.contact-sub {
+  margin-top: 12px;
+  color: var(--text-muted);
+}
+
+.contact-cards {
+  margin-top: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.contact-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--bg-elev);
+  border-radius: var(--radius-md);
+  padding: 18px 20px;
+  box-shadow: var(--shadow-sm);
+  color: var(--brown);
+  font-weight: 600;
+  font-size: 1.5rem;
+}
+
+.contact-card svg {
+  color: var(--rose-pink-hover);
+  flex-shrink: 0;
+}

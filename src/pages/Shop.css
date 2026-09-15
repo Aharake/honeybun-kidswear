@@ -1,0 +1,64 @@
+.shop-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.shop-header h1 {
+  font-size: 3rem;
+}
+
+.shop-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-elev);
+  border: 1.5px solid var(--border);
+  border-radius: 999px;
+  padding: 10px 18px;
+  color: var(--text-muted);
+  min-width: 260px;
+  flex: 1;
+  max-width: 360px;
+}
+
+.shop-search input {
+  border: none;
+  outline: none;
+  background: none;
+  flex: 1;
+  font-size: 1.4rem;
+  color: var(--text);
+}
+
+.shop-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 28px;
+}
+
+.filter-pill {
+  background: var(--bg-elev);
+  border: 1.5px solid var(--border);
+  color: var(--brown);
+  font-weight: 600;
+  font-size: 1.3rem;
+  padding: 8px 18px;
+  border-radius: 999px;
+}
+
+.filter-pill.is-active {
+  background: var(--rose-pink);
+  border-color: var(--rose-pink);
+  color: #fff;
+}
+
+.shop-empty {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 60px 0;
+}
