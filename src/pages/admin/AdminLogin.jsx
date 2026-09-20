@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import logo from '../../assets/logo.png'
 import './Admin.css'
 
 export default function AdminLogin() {
@@ -32,7 +33,7 @@ export default function AdminLogin() {
   return (
     <div className="admin-login-page">
       <form className="admin-login-card" onSubmit={handleSubmit}>
-        <p className="admin-login-eyebrow">HONEYBUN KIDSWEAR</p>
+        <img src={logo} alt="Honeybun Kidswear" className="admin-login-logo" />
         <h1>Admin login</h1>
 
         <div className="field">

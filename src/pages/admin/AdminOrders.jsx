@@ -72,8 +72,11 @@ export default function AdminOrders() {
                   <tr>
                     <td colSpan={6} style={{ background: 'var(--off-white)' }}>
                       <p><strong>Contact:</strong> {o.email} · {o.phone}</p>
-                      <p><strong>Deliver to:</strong> {o.address}, {o.city}</p>
+                      <p><strong>Deliver to:</strong> <span style={{ whiteSpace: 'pre-line' }}>{o.address}</span>, {o.city}</p>
                       {o.notes && <p><strong>Notes:</strong> {o.notes}</p>}
+                      {o.discount_amount > 0 && (
+                        <p><strong>Discount:</strong> {o.discount_code} (−${Number(o.discount_amount).toFixed(2)})</p>
+                      )}
                       <p style={{ marginTop: 8 }}><strong>Items:</strong></p>
                       <ul>
                         {o.items.map((item, i) => (

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
 import { supabase, generateOrderNumber } from '../lib/supabaseClient'
@@ -7,13 +7,14 @@ import './Checkout.css'
 const EMPTY_FORM = { customer_name: '', email: '', phone: '', address: '', city: '', notes: '' }
 
 export default function Checkout() {
-  const { items, subtotal, clearCart } = useCart()
+  const { items, subtotal, discount, discountAmount, total, removeCode, clearCart, checkStock } = useCart()
   const navigate = useNavigate()
   const [form, setForm] = useState(EMPTY_FORM)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
+  const orderPlaced = useRef(false)
 
-  if (items.length === 0) {
+  if (items.length === 0 && !orderPlaced.current) {
     return <Navigate to="/cart" replace />
   }
 
@@ -25,6 +26,26 @@ export default function Checkout() {
     e.preventDefault()
     setSubmitting(true)
     setError('')
+
+    const stock = await checkStock()
+    if (!stock.ok) {
+      setSubmitting(false)
+      setError(`${stock.message} Please review your bag and try again.`)
+      return
+    }
+
+    if (discount && discountAmount > 0) {
+      const { data: check } = await supabase.rpc('validate_discount_code', {
+        p_code: discount.code,
+        p_subtotal: subtotal,
+      })
+      if (!check?.valid) {
+        removeCode()
+        setSubmitting(false)
+        setError(`${check?.message || 'Your discount code is no longer valid.'} It was removed — please check your total and try again.`)
+        return
+      }
+    }
 
     const orderPayload = {
       order_number: generateOrderNumber(),
@@ -42,16 +63,13 @@ export default function Checkout() {
         size: i.size,
       })),
       subtotal,
-      total: subtotal,
+      total,
       status: 'pending',
       payment_method: 'cod',
+      ...(discountAmount > 0 ? { discount_code: discount.code, discount_amount: discountAmount } : {}),
     }
 
-    const { data, error: insertError } = await supabase
-      .from('orders')
-      .insert([orderPayload])
-      .select()
-      .single()
+    const { error: insertError } = await supabase.from('orders').insert([orderPayload])
 
     setSubmitting(false)
 
@@ -61,8 +79,20 @@ export default function Checkout() {
       return
     }
 
+    // Best-effort: reduce stock for the exact sizes purchased. Never blocks
+    // the order — it's already placed even if this fails.
+    supabase.rpc('decrement_product_stock', { items: orderPayload.items }).then(({ error: stockError }) => {
+      if (stockError) console.error('Stock decrement failed:', stockError)
+    })
+    if (orderPayload.discount_code) {
+      supabase.rpc('redeem_discount_code', { p_code: orderPayload.discount_code }).then(({ error: codeError }) => {
+        if (codeError) console.error('Discount redeem failed:', codeError)
+      })
+    }
+
+    orderPlaced.current = true
     clearCart()
-    navigate(`/order-confirmation/${data.order_number}`, { state: { order: data } })
+    navigate(`/order-confirmation/${orderPayload.order_number}`, { state: { order: orderPayload } })
   }
 
   return (
@@ -86,7 +116,15 @@ export default function Checkout() {
           </div>
           <div className="field">
             <label htmlFor="address">Delivery address</label>
-            <input id="address" name="address" required value={form.address} onChange={handleChange} />
+            <textarea
+              id="address"
+              name="address"
+              rows={3}
+              required
+              placeholder="Street, building, floor/apartment, nearest landmark…"
+              value={form.address}
+              onChange={handleChange}
+            />
           </div>
           <div className="field">
             <label htmlFor="city">City</label>
@@ -111,9 +149,15 @@ export default function Checkout() {
               <span>${(item.price * item.qty).toFixed(2)}</span>
             </div>
           ))}
+          {discountAmount > 0 && (
+            <div className="checkout-summary-row">
+              <span>Discount ({discount.code})</span>
+              <span>−${discountAmount.toFixed(2)}</span>
+            </div>
+          )}
           <div className="checkout-summary-total">
             <span>Total</span>
-            <span>${subtotal.toFixed(2)}</span>
+            <span>${total.toFixed(2)}</span>
           </div>
         </div>
       </div>

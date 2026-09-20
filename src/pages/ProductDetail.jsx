@@ -3,16 +3,20 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { Minus, Plus } from 'lucide-react'
 import { supabase } from '../lib/supabaseClient'
 import { useCart } from '../context/CartContext'
+import { useSale } from '../context/SaleContext'
+import { getPricing } from '../lib/pricing'
+import { sortSizeStock, totalStock } from '../lib/constants'
+import ImageCarousel from '../components/ImageCarousel'
 import './ProductDetail.css'
 
 export default function ProductDetail() {
   const { slug } = useParams()
   const navigate = useNavigate()
-  const { addItem } = useCart()
+  const { addItem, qtyInCart } = useCart()
+  const { sale } = useSale()
 
   const [product, setProduct] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [activeImage, setActiveImage] = useState(0)
   const [size, setSize] = useState('')
   const [qty, setQty] = useState(1)
   const [added, setAdded] = useState(false)
@@ -28,8 +32,10 @@ export default function ProductDetail() {
       .then(({ data }) => {
         if (!active) return
         setProduct(data)
-        setSize(data?.sizes?.[0] || '')
-        setActiveImage(0)
+        const sizeStock = sortSizeStock(data?.size_stock)
+        const firstInStock = sizeStock.find((s) => s.stock > 0)
+        setSize((firstInStock || sizeStock[0])?.size || '')
+        setQty(1)
         setLoading(false)
       })
     return () => {
@@ -51,10 +57,25 @@ export default function ProductDetail() {
   }
 
   const images = product.images?.length ? product.images : []
-  const outOfStock = product.stock <= 0
+  const sizeStock = sortSizeStock(product.size_stock)
+  const stock = totalStock(sizeStock)
+  const outOfStock = stock <= 0
+  const selectedStock = sizeStock.find((s) => s.size === size)?.stock ?? 0
+  const inBag = qtyInCart(product.id, size)
+  const room = Math.max(0, selectedStock - inBag)
+  const canAdd = Boolean(size) && room > 0
+  const shownQty = Math.max(1, Math.min(qty, room))
+  const pricing = getPricing(product, sale)
+
+  const handleSelectSize = (s) => {
+    setSize(s.size)
+    setQty(1)
+  }
 
   const handleAddToCart = () => {
-    addItem(product, { size, qty })
+    if (!canAdd) return
+    addItem(product, { size, qty: shownQty, price: pricing.current })
+    setQty(1)
     setAdded(true)
     setTimeout(() => setAdded(false), 1800)
   }
@@ -62,72 +83,82 @@ export default function ProductDetail() {
   return (
     <div className="container product-detail">
       <div className="product-detail-gallery">
-        <div className="product-detail-main-image">
-          {images[activeImage] ? (
-            <img src={images[activeImage]} alt={product.name} />
-          ) : (
-            <div className="product-card-placeholder">🧸</div>
-          )}
-        </div>
-        {images.length > 1 && (
-          <div className="product-detail-thumbs">
-            {images.map((img, i) => (
-              <button
-                key={img}
-                className={`product-detail-thumb ${i === activeImage ? 'is-active' : ''}`}
-                onClick={() => setActiveImage(i)}
-              >
-                <img src={img} alt="" />
-              </button>
-            ))}
-          </div>
-        )}
+        <ImageCarousel
+          key={product.id}
+          images={images}
+          alt={product.name}
+          badge={pricing.onSale ? `Sale −${pricing.percentOff}%` : null}
+        />
       </div>
 
       <div className="product-detail-info">
         <p className="product-card-category">{product.category}</p>
         <h1>{product.name}</h1>
         <div className="product-card-price" style={{ fontSize: '2rem' }}>
-          <span>${Number(product.price).toFixed(2)}</span>
-          {product.compare_at_price > product.price && (
-            <span className="product-card-compare">${Number(product.compare_at_price).toFixed(2)}</span>
-          )}
+          <span className={pricing.onSale ? 'product-card-now' : undefined}>${pricing.current.toFixed(2)}</span>
+          {pricing.original && <span className="product-card-compare">${pricing.original.toFixed(2)}</span>}
+          {pricing.onSale && <span className="product-detail-sale-tag">Sale −{pricing.percentOff}%</span>}
         </div>
 
         {product.description && <p className="product-detail-description">{product.description}</p>}
 
-        {product.sizes?.length > 0 && (
+        {sizeStock.length > 0 && (
           <div className="product-detail-sizes">
             <p className="field-label">Size</p>
             <div className="size-options">
-              {product.sizes.map((s) => (
+              {sizeStock.map((s) => (
                 <button
-                  key={s}
-                  className={`size-pill ${size === s ? 'is-active' : ''}`}
-                  onClick={() => setSize(s)}
+                  key={s.size}
+                  className={`size-pill ${size === s.size ? 'is-active' : ''} ${s.stock <= 0 ? 'is-sold-out' : ''}`}
+                  onClick={() => handleSelectSize(s)}
+                  disabled={s.stock <= 0}
                 >
-                  {s}
+                  {s.size}
+                  {s.stock <= 0 && <span className="size-pill-strike" aria-hidden="true" />}
                 </button>
               ))}
             </div>
+            {size && selectedStock > 0 && selectedStock <= 3 && (
+              <p className="product-detail-low-stock">Only {selectedStock} left in size {size}</p>
+            )}
+            {size && selectedStock <= 0 && (
+              <p className="product-detail-low-stock is-sold-out">Sold out in size {size}</p>
+            )}
+            {inBag > 0 && selectedStock > 0 && (
+              <p className="product-detail-in-bag">
+                {inBag} in your bag{room === 0 ? ' — that\'s all we have in this size' : ''}
+              </p>
+            )}
           </div>
         )}
 
         <div className="product-detail-qty">
           <p className="field-label">Quantity</p>
           <div className="qty-stepper">
-            <button onClick={() => setQty((q) => Math.max(1, q - 1))} aria-label="Decrease quantity">
+            <button onClick={() => setQty(Math.max(1, shownQty - 1))} aria-label="Decrease quantity" disabled={!canAdd}>
               <Minus size={16} />
             </button>
-            <span>{qty}</span>
-            <button onClick={() => setQty((q) => q + 1)} aria-label="Increase quantity">
+            <span>{shownQty}</span>
+            <button
+              onClick={() => setQty(Math.min(room, shownQty + 1))}
+              aria-label="Increase quantity"
+              disabled={!canAdd || shownQty >= room}
+            >
               <Plus size={16} />
             </button>
           </div>
         </div>
 
-        <button className="btn btn-primary product-detail-add" onClick={handleAddToCart} disabled={outOfStock}>
-          {outOfStock ? 'Out of stock' : added ? 'Added ✓' : 'Add to cart'}
+        <button className="btn btn-primary product-detail-add" onClick={handleAddToCart} disabled={!canAdd}>
+          {outOfStock
+            ? 'Out of stock'
+            : size && selectedStock > 0 && room === 0
+            ? 'All in your bag'
+            : !canAdd
+            ? 'Select a size'
+            : added
+            ? 'Added ✓'
+            : 'Add to cart'}
         </button>
 
         {added && (

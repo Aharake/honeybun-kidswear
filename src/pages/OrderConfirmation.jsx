@@ -28,12 +28,18 @@ export default function OrderConfirmation() {
                 </div>
               ))}
             </div>
+            {order.discount_amount > 0 && (
+              <div className="checkout-summary-row">
+                <span>Discount ({order.discount_code})</span>
+                <span>−${Number(order.discount_amount).toFixed(2)}</span>
+              </div>
+            )}
             <div className="checkout-summary-total">
               <span>Total (Cash on delivery)</span>
               <span>${Number(order.total).toFixed(2)}</span>
             </div>
             <p className="confirmation-address">
-              Delivering to: {order.address}, {order.city}
+              Delivering to: <span style={{ whiteSpace: 'pre-line' }}>{order.address}</span>, {order.city}
             </p>
           </div>
         </>

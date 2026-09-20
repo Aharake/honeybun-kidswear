@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { Menu, X, ShoppingBag } from 'lucide-react'
 import { useCart } from '../context/CartContext'
+import logo from '../assets/logo.png'
 import './Navbar.css'
 
 const LINKS = [
@@ -18,7 +19,7 @@ export default function Navbar() {
     <header className="navbar">
       <div className="container navbar-inner">
         <Link to="/" className="navbar-logo" onClick={() => setOpen(false)}>
-          HONEYBUN <span>KIDSWEAR</span>
+          <img src={logo} alt="Honeybun Kidswear" />
         </Link>
 
         <nav className="navbar-links-desktop" aria-label="Primary">
@@ -34,9 +35,14 @@ export default function Navbar() {
         </nav>
 
         <div className="navbar-right">
-          <Link to="/cart" className="navbar-cart" aria-label="Cart">
-            <ShoppingBag size={22} />
-            {totalCount > 0 && <span className="navbar-cart-badge">{totalCount}</span>}
+          <Link to="/cart" className="navbar-cart" aria-label="Bag">
+            <ShoppingBag size={26} />
+            <span className="navbar-cart-label">Bag</span>
+            {totalCount > 0 && (
+              <span key={totalCount} className="navbar-cart-badge">
+                {totalCount}
+              </span>
+            )}
           </Link>
           <button
             className="navbar-hamburger"

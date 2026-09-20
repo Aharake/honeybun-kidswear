@@ -1,0 +1,64 @@
+.sale-banner {
+  background: linear-gradient(135deg, var(--rose-pink) 0%, #d98aa0 100%);
+  color: #fff;
+  padding: 20px 24px;
+  text-align: center;
+}
+
+.sale-banner-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.sale-banner-badge {
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--rose-pink-hover);
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.sale-banner-title {
+  font-size: 2.4rem;
+  line-height: 1.15;
+  color: #fff;
+}
+
+.sale-banner-text {
+  font-family: var(--font-body);
+  font-size: 1.4rem;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.sale-banner-cta {
+  margin-top: 4px;
+  padding: 9px 20px;
+  font-size: 1.3rem;
+  background: #fff;
+  color: var(--dark-brown);
+  white-space: nowrap;
+}
+
+.sale-banner-cta:hover {
+  background: var(--cream);
+  opacity: 1;
+}
+
+@media (min-width: 900px) {
+  .sale-banner-inner {
+    flex-direction: row;
+    justify-content: center;
+    gap: 20px;
+  }
+  .sale-banner-cta {
+    margin-top: 0;
+  }
+}

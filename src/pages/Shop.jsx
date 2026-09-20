@@ -2,17 +2,20 @@ import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { Search } from 'lucide-react'
 import { supabase } from '../lib/supabaseClient'
+import { useCollections } from '../hooks/useCollections'
+import { useSale } from '../context/SaleContext'
 import ProductCard from '../components/ProductCard'
 import './Shop.css'
-
-const CATEGORIES = ['Newborn', 'Girls', 'Boys', 'Accessories']
 
 export default function Shop() {
   const [searchParams, setSearchParams] = useSearchParams()
   const category = searchParams.get('category') || ''
+  const onSaleOnly = searchParams.get('sale') === '1'
+  const { sale } = useSale()
   const [query, setQuery] = useState(searchParams.get('q') || '')
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
+  const { collections } = useCollections()
 
   useEffect(() => {
     let active = true
@@ -20,6 +23,7 @@ export default function Shop() {
 
     let request = supabase.from('products').select('*').eq('is_active', true)
     if (category) request = request.eq('category', category)
+    if (onSaleOnly) request = request.or('on_sale.eq.true,product_sale_price.not.is.null')
     const q = searchParams.get('q')
     if (q) request = request.or(`name.ilike.%${q}%,description.ilike.%${q}%`)
     request = request.order('created_at', { ascending: false })
@@ -34,7 +38,7 @@ export default function Shop() {
     return () => {
       active = false
     }
-  }, [category, searchParams])
+  }, [category, onSaleOnly, searchParams])
 
   const handleSearch = (e) => {
     e.preventDefault()
@@ -48,13 +52,28 @@ export default function Shop() {
     const next = new URLSearchParams(searchParams)
     if (cat) next.set('category', cat)
     else next.delete('category')
+    next.delete('sale')
+    setSearchParams(next)
+  }
+
+  const showSale = () => {
+    const next = new URLSearchParams(searchParams)
+    next.delete('category')
+    next.set('sale', '1')
     setSearchParams(next)
   }
 
   return (
     <div className="container">
       <div className="shop-header">
-        <h1>Shop All</h1>
+        <div>
+          <h1>Shop All</h1>
+          {!loading && (
+            <p className="shop-header-sub">
+              {products.length} {products.length === 1 ? 'piece' : 'pieces'} · sized newborn to 6 years
+            </p>
+          )}
+        </div>
         <form className="shop-search" onSubmit={handleSearch}>
           <Search size={18} />
           <input
@@ -67,16 +86,21 @@ export default function Shop() {
       </div>
 
       <div className="shop-filters">
-        <button className={`filter-pill ${!category ? 'is-active' : ''}`} onClick={() => setCategory('')}>
+        <button className={`filter-pill ${!category && !onSaleOnly ? 'is-active' : ''}`} onClick={() => setCategory('')}>
           All
         </button>
-        {CATEGORIES.map((cat) => (
+        {sale?.is_active && (
+          <button className={`filter-pill filter-pill-sale ${onSaleOnly ? 'is-active' : ''}`} onClick={showSale}>
+            Sale
+          </button>
+        )}
+        {collections.map((col) => (
           <button
-            key={cat}
-            className={`filter-pill ${category === cat ? 'is-active' : ''}`}
-            onClick={() => setCategory(cat)}
+            key={col.id}
+            className={`filter-pill ${category === col.name ? 'is-active' : ''}`}
+            onClick={() => setCategory(col.name)}
           >
-            {cat}
+            {col.name}
           </button>
         ))}
       </div>

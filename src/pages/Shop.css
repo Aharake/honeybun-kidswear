@@ -11,6 +11,12 @@
   font-size: 3rem;
 }
 
+.shop-header-sub {
+  margin-top: 4px;
+  color: var(--text-muted);
+  font-size: 1.3rem;
+}
+
 .shop-search {
   display: flex;
   align-items: center;
@@ -52,6 +58,17 @@
 }
 
 .filter-pill.is-active {
+  background: var(--brown);
+  border-color: var(--brown);
+  color: #fff;
+}
+
+.filter-pill-sale {
+  color: var(--rose-pink-hover);
+  border-color: var(--rose-pink);
+}
+
+.filter-pill-sale.is-active {
   background: var(--rose-pink);
   border-color: var(--rose-pink);
   color: #fff;

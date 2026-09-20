@@ -20,11 +20,10 @@
   gap: 16px;
 }
 
-.admin-login-eyebrow {
-  font-size: 1.1rem;
-  font-weight: 700;
-  letter-spacing: 0.15em;
-  color: var(--taupe);
+.admin-login-logo {
+  width: 140px;
+  height: auto;
+  align-self: center;
 }
 
 .admin-login-card h1 {
@@ -239,6 +238,133 @@
   background: var(--brown);
   border-color: var(--brown);
   color: #fff;
+}
+
+.admin-field-hint {
+  font-size: 1.15rem;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.admin-stock-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.admin-stock-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border);
+  background: var(--bg-elev);
+}
+
+.admin-stock-size {
+  width: 64px;
+  flex-shrink: 0;
+  font-weight: 600;
+  font-size: 1.3rem;
+  color: var(--brown);
+}
+
+.admin-stock-row input {
+  width: 90px;
+}
+
+.admin-card {
+  background: var(--bg-elev);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 20px;
+}
+
+.admin-card-title {
+  font-size: 1.7rem;
+  margin-bottom: 14px;
+}
+
+.admin-success {
+  margin-bottom: 14px;
+  font-weight: 700;
+  font-size: 1.3rem;
+  color: var(--sage);
+}
+
+.admin-switch {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  cursor: pointer;
+}
+
+.admin-switch input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.admin-switch-track {
+  position: relative;
+  flex-shrink: 0;
+  width: 52px;
+  height: 30px;
+  border-radius: 999px;
+  background: var(--light-gray);
+  transition: background 0.2s var(--ease);
+}
+
+.admin-switch-track::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s var(--ease);
+}
+
+.admin-switch input:checked + .admin-switch-track {
+  background: var(--sage);
+}
+
+.admin-switch input:checked + .admin-switch-track::after {
+  transform: translateX(22px);
+}
+
+.admin-switch input:focus-visible + .admin-switch-track {
+  outline: 2px solid var(--blue-gray);
+  outline-offset: 2px;
+}
+
+.admin-sale-box {
+  padding: 16px 18px;
+  border-radius: var(--radius-md);
+  border: 1.5px dashed var(--rose-pink);
+  background: var(--soft-pink);
+}
+
+.admin-banner-preview {
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.admin-badge-btn {
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.admin-stock-warning {
+  font-size: 1.1rem;
+  color: var(--rose-pink-hover);
 }
 
 .admin-stat-grid {

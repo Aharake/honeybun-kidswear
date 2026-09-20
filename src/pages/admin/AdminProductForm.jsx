@@ -2,10 +2,8 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { X } from 'lucide-react'
 import { supabase, slugify, PRODUCT_IMAGES_BUCKET } from '../../lib/supabaseClient'
+import { SIZE_OPTIONS, sortSizeStock } from '../../lib/constants'
 import './Admin.css'
-
-const SIZE_OPTIONS = ['Newborn', '0-3M', '3-6M', '6-12M', '1-2Y', '2-3Y', '3-4Y', '4-5Y', '5-6Y']
-const CATEGORY_OPTIONS = ['Newborn', 'Girls', 'Boys', 'Accessories']
 
 const EMPTY = {
   name: '',
@@ -13,11 +11,13 @@ const EMPTY = {
   description: '',
   price: '',
   compare_at_price: '',
-  category: CATEGORY_OPTIONS[0],
-  sizes: [],
-  stock: 0,
+  category: '',
+  size_stock: [],
   images: [],
   is_active: true,
+  saleOn: false,
+  product_sale_price: '',
+  hasSaleColumn: false,
 }
 
 export default function AdminProductForm() {
@@ -30,6 +30,19 @@ export default function AdminProductForm() {
   const [saving, setSaving] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState('')
+  const [collections, setCollections] = useState([])
+
+  useEffect(() => {
+    supabase
+      .from('collections')
+      .select('name')
+      .order('sort_order', { ascending: true })
+      .then(({ data }) => {
+        const names = (data || []).map((c) => c.name)
+        setCollections(names)
+        setForm((f) => (f.category ? f : { ...f, category: names[0] || '' }))
+      })
+  }, [])
 
   useEffect(() => {
     if (!isEdit) return
@@ -42,7 +55,14 @@ export default function AdminProductForm() {
         if (fetchError) {
           setError('Could not load product.')
         } else {
-          setForm({ ...EMPTY, ...data })
+          setForm({
+            ...EMPTY,
+            ...data,
+            size_stock: sortSizeStock(data.size_stock),
+            saleOn: data.product_sale_price !== null && data.product_sale_price !== undefined,
+            product_sale_price: data.product_sale_price ?? '',
+            hasSaleColumn: 'product_sale_price' in data,
+          })
         }
         setLoading(false)
       })
@@ -59,9 +79,20 @@ export default function AdminProductForm() {
   }
 
   const toggleSize = (size) => {
+    setForm((f) => {
+      const exists = f.size_stock.some((s) => s.size === size)
+      const next = exists
+        ? f.size_stock.filter((s) => s.size !== size)
+        : sortSizeStock([...f.size_stock, { size, stock: 0 }])
+      return { ...f, size_stock: next }
+    })
+  }
+
+  const updateStock = (size, stock) => {
+    const qty = Math.max(0, Number(stock) || 0)
     setForm((f) => ({
       ...f,
-      sizes: f.sizes.includes(size) ? f.sizes.filter((s) => s !== size) : [...f.sizes, size],
+      size_stock: f.size_stock.map((s) => (s.size === size ? { ...s, stock: qty } : s)),
     }))
   }
 
@@ -94,20 +125,29 @@ export default function AdminProductForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    setSaving(true)
     setError('')
+
+    const price = Number(form.price) || 0
+    const salePrice = Number(form.product_sale_price)
+    if (form.saleOn && !(salePrice > 0 && salePrice < price)) {
+      setError(`The sale price must be more than $0 and lower than the regular price ($${price.toFixed(2)}).`)
+      return
+    }
+    setSaving(true)
 
     const payload = {
       name: form.name.trim(),
       slug: form.slug.trim() || slugify(form.name),
       description: form.description.trim(),
-      price: Number(form.price) || 0,
+      price,
       compare_at_price: form.compare_at_price ? Number(form.compare_at_price) : null,
       category: form.category,
-      sizes: form.sizes,
-      stock: Number(form.stock) || 0,
+      size_stock: form.size_stock,
       images: form.images,
       is_active: form.is_active,
+      ...(form.saleOn || form.hasSaleColumn
+        ? { product_sale_price: form.saleOn ? salePrice : null }
+        : {}),
     }
 
     const request = isEdit
@@ -154,54 +194,104 @@ export default function AdminProductForm() {
           <textarea id="description" name="description" rows={4} value={form.description} onChange={handleChange} />
         </div>
 
-        <div className="admin-form-row">
-          <div className="field">
-            <label htmlFor="price">Price ($)</label>
-            <input id="price" name="price" type="number" step="0.01" min="0" required value={form.price} onChange={handleChange} />
-          </div>
-          <div className="field">
-            <label htmlFor="compare_at_price">Compare-at price ($, optional)</label>
-            <input
-              id="compare_at_price"
-              name="compare_at_price"
-              type="number"
-              step="0.01"
-              min="0"
-              value={form.compare_at_price ?? ''}
-              onChange={handleChange}
-            />
-          </div>
+        <div className="field">
+          <label htmlFor="price">Regular price ($)</label>
+          <input id="price" name="price" type="number" step="0.01" min="0" required value={form.price} onChange={handleChange} />
         </div>
 
-        <div className="admin-form-row">
-          <div className="field">
-            <label htmlFor="category">Category</label>
-            <select id="category" name="category" value={form.category} onChange={handleChange}>
-              {CATEGORY_OPTIONS.map((c) => (
-                <option key={c} value={c}>{c}</option>
-              ))}
-            </select>
-          </div>
-          <div className="field">
-            <label htmlFor="stock">Stock quantity</label>
-            <input id="stock" name="stock" type="number" min="0" required value={form.stock} onChange={handleChange} />
-          </div>
+        <div className="admin-sale-box">
+          <label className="admin-switch">
+            <input
+              type="checkbox"
+              checked={form.saleOn}
+              onChange={(e) => setForm((f) => ({ ...f, saleOn: e.target.checked }))}
+            />
+            <span className="admin-switch-track" />
+            <span>
+              <strong>{form.saleOn ? 'This product is on sale' : 'Put this product on sale'}</strong>
+              <span className="admin-field-hint" style={{ display: 'block', marginBottom: 0 }}>
+                Shows the regular price crossed out, your sale price, and a Sale tag on the photo.
+              </span>
+            </span>
+          </label>
+
+          {form.saleOn && (
+            <div className="field" style={{ marginTop: 14 }}>
+              <label htmlFor="product_sale_price">Sale price ($)</label>
+              <input
+                id="product_sale_price"
+                name="product_sale_price"
+                type="number"
+                step="0.01"
+                min="0"
+                required
+                value={form.product_sale_price}
+                onChange={handleChange}
+              />
+              {Number(form.product_sale_price) > 0 && Number(form.product_sale_price) < Number(form.price) ? (
+                <p className="admin-field-hint" style={{ marginTop: 6, marginBottom: 0 }}>
+                  Customers pay ${Number(form.product_sale_price).toFixed(2)} instead of ${Number(form.price).toFixed(2)} (
+                  −{Math.round((1 - Number(form.product_sale_price) / Number(form.price)) * 100)}%)
+                </p>
+              ) : (
+                form.product_sale_price !== '' && (
+                  <p className="admin-stock-warning" style={{ marginTop: 6 }}>
+                    Must be lower than the regular price.
+                  </p>
+                )
+              )}
+            </div>
+          )}
         </div>
 
         <div className="field">
-          <label>Available sizes</label>
+          <label htmlFor="category">Collection</label>
+          <select id="category" name="category" required value={form.category} onChange={handleChange}>
+            {form.category && !collections.includes(form.category) && (
+              <option value={form.category}>{form.category} (not a collection)</option>
+            )}
+            {collections.map((c) => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </select>
+          {collections.length === 0 && (
+            <p className="admin-field-hint">Create a collection first under Collections in the sidebar.</p>
+          )}
+        </div>
+
+        <div className="field">
+          <label>Sizes &amp; stock</label>
+          <p className="admin-field-hint">Tap a size to offer it, then set how many you have in stock.</p>
           <div className="admin-size-checks">
             {SIZE_OPTIONS.map((s) => (
               <button
                 type="button"
                 key={s}
-                className={`admin-size-check ${form.sizes.includes(s) ? 'is-active' : ''}`}
+                className={`admin-size-check ${form.size_stock.some((x) => x.size === s) ? 'is-active' : ''}`}
                 onClick={() => toggleSize(s)}
               >
                 {s}
               </button>
             ))}
           </div>
+
+          {form.size_stock.length > 0 && (
+            <div className="admin-stock-grid">
+              {form.size_stock.map((s) => (
+                <div className="admin-stock-row" key={s.size}>
+                  <span className="admin-stock-size">{s.size}</span>
+                  <input
+                    type="number"
+                    min="0"
+                    value={s.stock}
+                    onChange={(e) => updateStock(s.size, e.target.value)}
+                    aria-label={`Stock for size ${s.size}`}
+                  />
+                  {s.stock <= 0 && <span className="badge badge-cancelled">Sold out</span>}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="field">

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Pencil, Trash2, Plus } from 'lucide-react'
 import { supabase } from '../../lib/supabaseClient'
+import { totalStock } from '../../lib/constants'
 import './Admin.css'
 
 export default function AdminProducts() {
@@ -49,7 +50,7 @@ export default function AdminProducts() {
             <tr>
               <th></th>
               <th>Name</th>
-              <th>Category</th>
+              <th>Collection</th>
               <th>Price</th>
               <th>Stock</th>
               <th>Status</th>
@@ -66,10 +67,22 @@ export default function AdminProducts() {
                     <div className="admin-table-thumb" />
                   )}
                 </td>
-                <td>{p.name}</td>
+                <td>
+                  {p.name}
+                  {p.product_sale_price !== null && p.product_sale_price !== undefined && (
+                    <span className="admin-stock-warning"> · on sale ${Number(p.product_sale_price).toFixed(2)}</span>
+                  )}
+                </td>
                 <td>{p.category}</td>
                 <td>${Number(p.price).toFixed(2)}</td>
-                <td>{p.stock}</td>
+                <td>
+                  {totalStock(p.size_stock)}
+                  {p.size_stock?.some((s) => s.stock <= 0) && (
+                    <span className="admin-stock-warning">
+                      {' '}({p.size_stock.filter((s) => s.stock <= 0).length} size{p.size_stock.filter((s) => s.stock <= 0).length === 1 ? '' : 's'} sold out)
+                    </span>
+                  )}
+                </td>
                 <td>
                   <span className={`badge ${p.is_active ? 'badge-delivered' : 'badge-cancelled'}`}>
                     {p.is_active ? 'Active' : 'Hidden'}
