@@ -259,6 +259,11 @@ alter table products add column if not exists sale_price numeric(10,2);
 -- whether or not the store-wide sale above is switched on.
 alter table products add column if not exists product_sale_price numeric(10,2);
 
+-- How each product photo is framed on the website (zoom + position), set by
+-- the admin in the photo adjuster. Keyed by image URL:
+-- { "https://…/photo.jpg": { "zoom": 1.4, "x": 0.5, "y": 0.3 } }
+alter table products add column if not exists image_adjust jsonb not null default '{}'::jsonb;
+
 -- Discount codes ------------------------------------------------------------
 -- Not readable by shoppers at all (otherwise anyone could list every code).
 -- Shoppers only ever go through the two functions below.

@@ -188,6 +188,34 @@
   margin-top: 8px;
 }
 
+.admin-image-block {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  width: 84px;
+}
+
+.admin-adjust-btn {
+  padding: 5px 0;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border);
+  background: var(--bg-elev);
+  color: var(--brown);
+  font-weight: 700;
+  font-size: 1.15rem;
+}
+
+.admin-adjust-btn:hover {
+  border-color: var(--rose-pink);
+}
+
+.admin-adjust-btn.is-adjusted {
+  background: var(--soft-pink);
+  border-color: var(--rose-pink);
+  color: var(--rose-pink-hover);
+}
+
 .admin-image-thumb {
   position: relative;
   width: 84px;
@@ -263,8 +291,35 @@
   background: var(--bg-elev);
 }
 
+.admin-size-check.is-custom {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.admin-custom-size {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.admin-custom-size input {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border);
+  background: var(--bg-elev);
+  color: var(--text);
+}
+
+.admin-custom-size .btn {
+  padding: 8px 16px;
+  font-size: 1.3rem;
+}
+
 .admin-stock-size {
-  width: 64px;
+  min-width: 64px;
   flex-shrink: 0;
   font-weight: 600;
   font-size: 1.3rem;

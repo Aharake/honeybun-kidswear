@@ -3,6 +3,8 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { X } from 'lucide-react'
 import { supabase, slugify, PRODUCT_IMAGES_BUCKET } from '../../lib/supabaseClient'
 import { SIZE_OPTIONS, sortSizeStock } from '../../lib/constants'
+import { getAdjust, isAdjusted } from '../../lib/imageAdjust'
+import PhotoAdjuster from '../../components/PhotoAdjuster'
 import './Admin.css'
 
 const EMPTY = {
@@ -14,10 +16,12 @@ const EMPTY = {
   category: '',
   size_stock: [],
   images: [],
+  image_adjust: {},
   is_active: true,
   saleOn: false,
   product_sale_price: '',
   hasSaleColumn: false,
+  hasAdjustColumn: false,
 }
 
 export default function AdminProductForm() {
@@ -31,6 +35,9 @@ export default function AdminProductForm() {
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState('')
   const [collections, setCollections] = useState([])
+  const [adjusting, setAdjusting] = useState(null)
+  const [customSize, setCustomSize] = useState('')
+  const [customError, setCustomError] = useState('')
 
   useEffect(() => {
     supabase
@@ -62,6 +69,8 @@ export default function AdminProductForm() {
             saleOn: data.product_sale_price !== null && data.product_sale_price !== undefined,
             product_sale_price: data.product_sale_price ?? '',
             hasSaleColumn: 'product_sale_price' in data,
+            image_adjust: data.image_adjust || {},
+            hasAdjustColumn: 'image_adjust' in data,
           })
         }
         setLoading(false)
@@ -86,6 +95,26 @@ export default function AdminProductForm() {
         : sortSizeStock([...f.size_stock, { size, stock: 0 }])
       return { ...f, size_stock: next }
     })
+  }
+
+  const addCustomSize = () => {
+    const label = customSize.trim().replace(/\s+/g, ' ')
+    if (!label) return
+    if (label.length > 16) {
+      setCustomError('Keep it short — 16 characters or fewer.')
+      return
+    }
+    const existing = [...SIZE_OPTIONS, ...form.size_stock.map((s) => s.size)].find(
+      (s) => s.toLowerCase() === label.toLowerCase()
+    )
+    const size = existing || label
+    if (form.size_stock.some((s) => s.size === size)) {
+      setCustomError(`"${size}" is already added.`)
+      return
+    }
+    setCustomError('')
+    setCustomSize('')
+    setForm((f) => ({ ...f, size_stock: sortSizeStock([...f.size_stock, { size, stock: 0 }]) }))
   }
 
   const updateStock = (size, stock) => {
@@ -120,7 +149,24 @@ export default function AdminProductForm() {
   }
 
   const removeImage = (url) => {
-    setForm((f) => ({ ...f, images: f.images.filter((img) => img !== url) }))
+    setForm((f) => {
+      const { [url]: removed, ...rest } = f.image_adjust || {}
+      void removed
+      return { ...f, images: f.images.filter((img) => img !== url), image_adjust: rest }
+    })
+  }
+
+  const applyAdjust = (url, adj) => {
+    setForm((f) => {
+      const next = { ...(f.image_adjust || {}) }
+      if (isAdjusted(adj)) {
+        next[url] = { zoom: Number(adj.zoom.toFixed(3)), x: Number(adj.x.toFixed(3)), y: Number(adj.y.toFixed(3)) }
+      } else {
+        delete next[url]
+      }
+      return { ...f, image_adjust: next }
+    })
+    setAdjusting(null)
   }
 
   const handleSubmit = async (e) => {
@@ -148,6 +194,9 @@ export default function AdminProductForm() {
       ...(form.saleOn || form.hasSaleColumn
         ? { product_sale_price: form.saleOn ? salePrice : null }
         : {}),
+      ...(Object.keys(form.image_adjust || {}).length > 0 || form.hasAdjustColumn
+        ? { image_adjust: form.image_adjust || {} }
+        : {}),
     }
 
     const request = isEdit
@@ -159,7 +208,16 @@ export default function AdminProductForm() {
     setSaving(false)
 
     if (saveError) {
-      setError(saveError.message.includes('duplicate') ? 'A product with this slug already exists.' : 'Could not save product.')
+      const missing = saveError.message.match(/'(\w+)' column|column "?(?:products\.)?(\w+)"?/i)
+      const column = missing && (missing[1] || missing[2])
+      let message = 'Could not save product.'
+      if (saveError.message.includes('duplicate')) {
+        message = 'A product with this slug already exists.'
+      } else if (column) {
+        message = `Your database is missing the "${column}" field. Run the latest schema.sql in Supabase (SQL Editor), then save again.`
+      }
+      console.error(saveError)
+      setError(message)
       return
     }
 
@@ -273,7 +331,45 @@ export default function AdminProductForm() {
                 {s}
               </button>
             ))}
+            {form.size_stock
+              .map((s) => s.size)
+              .filter((s) => !SIZE_OPTIONS.includes(s))
+              .map((s) => (
+                <button
+                  type="button"
+                  key={s}
+                  className="admin-size-check is-active is-custom"
+                  onClick={() => toggleSize(s)}
+                  title="Custom size — tap to remove"
+                >
+                  {s} <X size={11} />
+                </button>
+              ))}
           </div>
+
+          <div className="admin-custom-size">
+            <input
+              type="text"
+              placeholder="Custom size, e.g. 10-11Y or One size"
+              value={customSize}
+              maxLength={16}
+              onChange={(e) => {
+                setCustomSize(e.target.value)
+                setCustomError('')
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault()
+                  addCustomSize()
+                }
+              }}
+              aria-label="Custom size"
+            />
+            <button type="button" className="btn btn-secondary" onClick={addCustomSize}>
+              Add size
+            </button>
+          </div>
+          {customError && <p className="admin-stock-warning" style={{ marginTop: 6 }}>{customError}</p>}
 
           {form.size_stock.length > 0 && (
             <div className="admin-stock-grid">
@@ -299,16 +395,29 @@ export default function AdminProductForm() {
           <input id="images" type="file" accept="image/*" multiple onChange={handleUpload} disabled={uploading} />
           {uploading && <p style={{ fontSize: '1.2rem', color: 'var(--text-muted)' }}>Uploading…</p>}
           {form.images.length > 0 && (
-            <div className="admin-images">
-              {form.images.map((url) => (
-                <div key={url} className="admin-image-thumb">
-                  <img src={url} alt="" />
-                  <button type="button" className="admin-image-remove" onClick={() => removeImage(url)} aria-label="Remove image">
-                    <X size={12} />
-                  </button>
-                </div>
-              ))}
-            </div>
+            <>
+              <p className="admin-field-hint" style={{ marginTop: 8 }}>
+                The first photo is the main one. Tap a photo's <strong>Adjust</strong> button to zoom and position it and preview how it looks on the website.
+              </p>
+              <div className="admin-images">
+                {form.images.map((url) => {
+                  const adjusted = isAdjusted(getAdjust(form.image_adjust, url))
+                  return (
+                    <div key={url} className="admin-image-block">
+                      <div className="admin-image-thumb">
+                        <img src={url} alt="" />
+                        <button type="button" className="admin-image-remove" onClick={() => removeImage(url)} aria-label="Remove image">
+                          <X size={12} />
+                        </button>
+                      </div>
+                      <button type="button" className={`admin-adjust-btn ${adjusted ? 'is-adjusted' : ''}`} onClick={() => setAdjusting(url)}>
+                        {adjusted ? 'Adjusted ✓' : 'Adjust'}
+                      </button>
+                    </div>
+                  )
+                })}
+              </div>
+            </>
           )}
         </div>
 
@@ -323,6 +432,18 @@ export default function AdminProductForm() {
           {saving ? 'Saving…' : isEdit ? 'Save changes' : 'Add product'}
         </button>
       </form>
+
+      {adjusting && (
+        <PhotoAdjuster
+          key={adjusting}
+          src={adjusting}
+          value={getAdjust(form.image_adjust, adjusting)}
+          name={form.name}
+          price={form.saleOn && Number(form.product_sale_price) > 0 ? form.product_sale_price : form.price}
+          onApply={(adj) => applyAdjust(adjusting, adj)}
+          onClose={() => setAdjusting(null)}
+        />
+      )}
     </div>
   )
 }

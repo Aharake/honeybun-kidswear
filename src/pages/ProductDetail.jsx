@@ -87,6 +87,7 @@ export default function ProductDetail() {
           key={product.id}
           images={images}
           alt={product.name}
+          adjust={product.image_adjust}
           badge={pricing.onSale ? `Sale −${pricing.percentOff}%` : null}
         />
       </div>

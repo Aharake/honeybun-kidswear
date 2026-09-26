@@ -4,6 +4,7 @@ import { useCart } from '../context/CartContext'
 import { useSale } from '../context/SaleContext'
 import { getPricing } from '../lib/pricing'
 import { sortSizeStock, totalStock } from '../lib/constants'
+import { adjustStyle, getAdjust } from '../lib/imageAdjust'
 import './ProductCard.css'
 
 export default function ProductCard({ product }) {
@@ -38,7 +39,16 @@ export default function ProductCard({ product }) {
   return (
     <Link to={`/product/${product.slug}`} className="product-card">
       <div className="product-card-image">
-        {image ? <img src={image} alt={product.name} loading="lazy" /> : <div className="product-card-placeholder">🧸</div>}
+        {image ? (
+          <img
+            src={image}
+            alt={product.name}
+            loading="lazy"
+            style={adjustStyle(getAdjust(product.image_adjust, image))}
+          />
+        ) : (
+          <div className="product-card-placeholder">🧸</div>
+        )}
         {pricing.onSale && (
           <span className="product-card-badge product-card-badge-sale">Sale −{pricing.percentOff}%</span>
         )}

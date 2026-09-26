@@ -1,8 +1,9 @@
 import { useRef, useState } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { adjustStyle, getAdjust } from '../lib/imageAdjust'
 import './ImageCarousel.css'
 
-export default function ImageCarousel({ images, alt, badge }) {
+export default function ImageCarousel({ images, alt, badge, adjust }) {
   const viewportRef = useRef(null)
   const [index, setIndex] = useState(0)
   const multiple = images.length > 1
@@ -56,7 +57,12 @@ export default function ImageCarousel({ images, alt, badge }) {
         >
           {images.map((src, i) => (
             <div className="carousel-slide" key={src} aria-label={`Photo ${i + 1} of ${images.length}`}>
-              <img src={src} alt={i === 0 ? alt : ''} draggable="false" />
+              <img
+                src={src}
+                alt={i === 0 ? alt : ''}
+                draggable="false"
+                style={adjustStyle(getAdjust(adjust, src))}
+              />
             </div>
           ))}
         </div>
