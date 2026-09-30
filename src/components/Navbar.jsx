@@ -55,20 +55,26 @@ export default function Navbar() {
         </div>
       </div>
 
-      {open && (
-        <nav className="navbar-mobile" aria-label="Mobile">
-          {LINKS.map((link) => (
-            <NavLink
-              key={link.to}
-              to={link.to}
-              className={({ isActive }) => `navbar-mobile-link ${isActive ? 'is-active' : ''}`}
-              onClick={() => setOpen(false)}
-            >
-              {link.label}
-            </NavLink>
-          ))}
-        </nav>
-      )}
+      <div className={`navbar-drawer-backdrop ${open ? 'is-open' : ''}`} onClick={() => setOpen(false)} />
+      <nav className={`navbar-mobile ${open ? 'is-open' : ''}`} aria-label="Mobile">
+        <button
+          className="navbar-drawer-close"
+          onClick={() => setOpen(false)}
+          aria-label="Close menu"
+        >
+          <X size={22} />
+        </button>
+        {LINKS.map((link) => (
+          <NavLink
+            key={link.to}
+            to={link.to}
+            className={({ isActive }) => `navbar-mobile-link ${isActive ? 'is-active' : ''}`}
+            onClick={() => setOpen(false)}
+          >
+            {link.label}
+          </NavLink>
+        ))}
+      </nav>
     </header>
   )
 }
