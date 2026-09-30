@@ -39,7 +39,7 @@
 }
 
 .navbar-link.is-active {
-  color: var(--rose-pink-hover);
+  color: var(--honey-hover);
 }
 
 .navbar-right {
@@ -66,7 +66,7 @@
   position: absolute;
   top: -8px;
   right: -10px;
-  background: var(--rose-pink);
+  background: var(--honey);
   color: #fff;
   font-size: 1rem;
   font-weight: 700;
@@ -148,7 +148,7 @@
 }
 
 .navbar-mobile-link.is-active {
-  color: var(--rose-pink-hover);
+  color: var(--honey-hover);
 }
 
 @media (min-width: 860px) {

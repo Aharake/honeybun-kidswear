@@ -92,7 +92,7 @@
 .adjuster-zoom input[type='range'] {
   flex: 1;
   min-width: 0;
-  accent-color: var(--rose-pink);
+  accent-color: var(--honey);
 }
 
 .adjuster-step {

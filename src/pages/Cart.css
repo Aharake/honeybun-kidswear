@@ -31,7 +31,7 @@
   flex-shrink: 0;
   border-radius: var(--radius-sm);
   overflow: hidden;
-  background: var(--soft-pink);
+  background: var(--honey-tint);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -79,7 +79,7 @@
 }
 
 .cart-item-remove:hover {
-  color: var(--rose-pink-hover);
+  color: var(--honey-hover);
 }
 
 .cart-summary {
@@ -127,7 +127,7 @@
   margin-top: 4px;
   font-size: 1.15rem;
   font-weight: 700;
-  color: var(--rose-pink-hover);
+  color: var(--honey-hover);
 }
 
 .qty-stepper button:disabled {
@@ -163,7 +163,7 @@
   margin-bottom: 14px;
   padding: 10px 14px;
   border-radius: var(--radius-sm);
-  background: var(--soft-pink);
+  background: var(--honey-tint);
   color: var(--brown);
   font-weight: 700;
   font-size: 1.3rem;
@@ -178,7 +178,7 @@
 .cart-code-applied button {
   background: none;
   border: none;
-  color: var(--rose-pink-hover);
+  color: var(--honey-hover);
   font-weight: 700;
   font-size: 1.2rem;
   padding: 0;

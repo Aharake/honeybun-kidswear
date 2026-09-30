@@ -3,7 +3,7 @@ import { Bar, BarChart, CartesianGrid, Line, LineChart, ResponsiveContainer, Too
 import { supabase } from '../../lib/supabaseClient'
 import './Admin.css'
 
-const CHART_COLOR = '#E8A7B3'
+const CHART_COLOR = '#E0972C'
 const CHART_COLOR_2 = '#8FA8C9'
 
 function lastNDays(n) {

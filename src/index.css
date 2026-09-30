@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Quicksand:wght@400;500;600;700&family=Karla:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;500;600;700;800&display=swap');
 
 html {
   font-size: 62.5%;
@@ -9,11 +9,11 @@ html {
 :root {
   --cream: #FFF9F4;
   --brown: #6B4F3A;
-  --blush-pink: #F7D7D6;
+  --clay: #D97757;
   --dusty-blue: #A7B8C6;
   --warm-beige: #EADCC8;
 
-  --soft-pink: #FDECEF;
+  --honey-tint: #FBF0DA;
   --taupe: #C9B8A7;
   --sage-green: #B7C4A7;
   --lavender: #DCCDEB;
@@ -24,23 +24,23 @@ html {
   --light-gray: #E6E6E6;
   --off-white: #F8F8F8;
 
-  --rose-pink: #E8A7B3;
-  --rose-pink-hover: #DD8FA0;
+  --honey: #E0972C;
+  --honey-hover: #C67F1F;
   --blue-gray: #8FA8C9;
   --mustard: #F3D9A6;
   --sage: #96B48F;
 
   --bg: #FFFFFF;
   --bg-elev: #FFFFFF;
-  --bg-soft: var(--soft-pink);
+  --bg-soft: var(--honey-tint);
   --border: var(--light-gray);
   --text: var(--dark-brown);
   --text-muted: var(--gray);
   --text-on-accent: #FFFFFF;
 
-  --font-display: 'Fredoka', 'Quicksand', system-ui, sans-serif;
-  --font-sans: 'Quicksand', system-ui, sans-serif;
-  --font-body: 'Karla', 'Quicksand', system-ui, sans-serif;
+  --font-display: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+  --font-sans: 'Nunito', system-ui, sans-serif;
+  --font-body: 'Nunito', system-ui, sans-serif;
 
   --radius-sm: 10px;
   --radius-md: 16px;
@@ -131,12 +131,12 @@ input, textarea, select {
 }
 
 .btn-primary {
-  background-color: var(--rose-pink);
+  background-color: var(--honey);
   color: var(--text-on-accent);
 }
 
 .btn-primary:hover {
-  background-color: var(--rose-pink-hover);
+  background-color: var(--honey-hover);
 }
 
 .btn-secondary {
@@ -179,7 +179,7 @@ input, textarea, select {
 .badge-confirmed { background: var(--sky-blue); color: var(--dark-brown); }
 .badge-shipped { background: var(--lavender); color: var(--dark-brown); }
 .badge-delivered { background: var(--sage); color: #fff; }
-.badge-cancelled { background: var(--blush-pink); color: var(--dark-brown); }
+.badge-cancelled { background: var(--clay); color: #fff; }
 
 .field {
   display: flex;

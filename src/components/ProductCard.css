@@ -46,7 +46,7 @@
 }
 
 .product-card-badge-sale {
-  background: var(--rose-pink);
+  background: var(--honey);
 }
 
 .product-card-oos {
@@ -97,7 +97,7 @@
 }
 
 .product-card-now {
-  color: var(--rose-pink-hover);
+  color: var(--honey-hover);
 }
 
 .product-card-compare {
@@ -121,8 +121,8 @@
 }
 
 .product-card-quickadd:hover:not(:disabled) {
-  background: var(--soft-pink);
-  border-color: var(--rose-pink);
+  background: var(--honey-tint);
+  border-color: var(--honey);
   opacity: 1;
 }
 

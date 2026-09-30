@@ -81,7 +81,7 @@
   left: 12px;
   padding: 6px 14px;
   border-radius: 999px;
-  background: var(--rose-pink);
+  background: var(--honey);
   color: #fff;
   font-size: 1.3rem;
   font-weight: 800;
@@ -156,7 +156,7 @@
 }
 
 .carousel-thumb.is-active {
-  border-color: var(--rose-pink);
+  border-color: var(--honey);
   opacity: 1;
 }
 

@@ -64,13 +64,13 @@
 }
 
 .filter-pill-sale {
-  color: var(--rose-pink-hover);
-  border-color: var(--rose-pink);
+  color: var(--honey-hover);
+  border-color: var(--honey);
 }
 
 .filter-pill-sale.is-active {
-  background: var(--rose-pink);
-  border-color: var(--rose-pink);
+  background: var(--honey);
+  border-color: var(--honey);
   color: #fff;
 }
 

@@ -12,7 +12,7 @@
   font-size: 1.2rem;
   font-weight: 700;
   letter-spacing: 0.15em;
-  color: var(--rose-pink-hover);
+  color: var(--honey-hover);
 }
 
 .hero-photo {
@@ -140,7 +140,7 @@
   font-family: var(--font-display);
   font-size: 8rem;
   color: rgba(255, 255, 255, 0.85);
-  background: linear-gradient(135deg, var(--rose-pink), var(--dusty-blue));
+  background: linear-gradient(135deg, var(--honey), var(--dusty-blue));
 }
 
 .category-card {

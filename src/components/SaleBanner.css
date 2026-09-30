@@ -1,5 +1,5 @@
 .sale-banner {
-  background: linear-gradient(135deg, var(--rose-pink) 0%, #d98aa0 100%);
+  background: linear-gradient(135deg, var(--honey) 0%, #b5671a 100%);
   color: #fff;
   padding: 20px 24px;
   text-align: center;
@@ -18,7 +18,7 @@
   padding: 5px 14px;
   border-radius: 999px;
   background: #fff;
-  color: var(--rose-pink-hover);
+  color: var(--honey-hover);
   font-size: 1.15rem;
   font-weight: 800;
   letter-spacing: 0.08em;

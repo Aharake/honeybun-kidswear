@@ -12,7 +12,7 @@
   align-self: center;
   padding: 4px 12px;
   border-radius: 999px;
-  background: var(--rose-pink);
+  background: var(--honey);
   color: #fff;
   font-size: 1.2rem;
   font-weight: 700;
@@ -91,7 +91,7 @@
   margin-top: 10px;
   font-size: 1.2rem;
   font-weight: 600;
-  color: var(--rose-pink-hover);
+  color: var(--honey-hover);
 }
 
 .product-detail-in-bag {
