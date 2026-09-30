@@ -35,9 +35,14 @@ export default function AdminProducts() {
     <div>
       <div className="admin-header-row">
         <h1>Products</h1>
-        <Link to="/admin/products/new" className="btn btn-primary">
-          <Plus size={16} /> Add product
-        </Link>
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+          <Link to="/admin/products/bulk" className="btn btn-secondary">
+            Bulk add photos
+          </Link>
+          <Link to="/admin/products/new" className="btn btn-primary">
+            <Plus size={16} /> Add product
+          </Link>
+        </div>
       </div>
 
       {loading ? (

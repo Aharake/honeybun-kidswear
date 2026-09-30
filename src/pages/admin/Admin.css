@@ -399,6 +399,138 @@
   outline-offset: 2px;
 }
 
+.admin-optional {
+  font-family: var(--font-sans);
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.bulk-drop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 32px 16px;
+  border: 2px dashed var(--taupe);
+  border-radius: var(--radius-md);
+  background: var(--cream);
+  color: var(--brown);
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.15s var(--ease), background 0.15s var(--ease);
+}
+
+.bulk-drop:hover,
+.bulk-drop:focus-visible {
+  border-color: var(--rose-pink);
+  background: var(--soft-pink);
+  outline: none;
+}
+
+.bulk-drop span {
+  font-size: 1.25rem;
+  color: var(--text-muted);
+}
+
+.bulk-stock {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--brown);
+}
+
+.bulk-stock input {
+  width: 90px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border);
+  background: var(--bg-elev);
+  color: var(--text);
+}
+
+.bulk-import {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border);
+  background: var(--bg-elev);
+  color: var(--text);
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: 1.2rem;
+  resize: vertical;
+}
+
+.bulk-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.bulk-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 12px;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--border);
+  background: var(--bg-elev);
+}
+
+.bulk-row.is-merged {
+  margin-left: 28px;
+  background: var(--off-white);
+}
+
+.bulk-thumb {
+  flex-shrink: 0;
+  width: 84px;
+  aspect-ratio: 3 / 4;
+  object-fit: contain;
+  border-radius: var(--radius-sm);
+  background: var(--cream);
+}
+
+.bulk-fields {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bulk-fields input,
+.bulk-fields textarea {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border);
+  background: var(--bg-elev);
+  color: var(--text);
+  font-family: inherit;
+}
+
+.bulk-fields .bulk-price {
+  max-width: 200px;
+}
+
+.bulk-merge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--brown);
+}
+
+.bulk-merge input {
+  width: auto;
+}
+
 .admin-sale-box {
   padding: 16px 18px;
   border-radius: var(--radius-md);

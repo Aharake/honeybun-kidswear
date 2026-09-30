@@ -21,6 +21,7 @@ import AdminProducts from './pages/admin/AdminProducts'
 import AdminProductForm from './pages/admin/AdminProductForm'
 import AdminCollections from './pages/admin/AdminCollections'
 import AdminCollectionForm from './pages/admin/AdminCollectionForm'
+import AdminBulkAdd from './pages/admin/AdminBulkAdd'
 import AdminSale from './pages/admin/AdminSale'
 import AdminDiscounts from './pages/admin/AdminDiscounts'
 import AdminOrders from './pages/admin/AdminOrders'
@@ -56,6 +57,7 @@ function App() {
             >
               <Route index element={<Navigate to="products" replace />} />
               <Route path="products" element={<AdminProducts />} />
+              <Route path="products/bulk" element={<AdminBulkAdd />} />
               <Route path="products/new" element={<AdminProductForm />} />
               <Route path="products/:id/edit" element={<AdminProductForm />} />
               <Route path="collections" element={<AdminCollections />} />
