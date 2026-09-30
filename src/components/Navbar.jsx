@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { Menu, X, ShoppingBag } from 'lucide-react'
 import { useCart } from '../context/CartContext'
@@ -13,10 +13,30 @@ const LINKS = [
 
 export default function Navbar() {
   const [open, setOpen] = useState(false)
+  const [hidden, setHidden] = useState(false)
+  const lastY = useRef(0)
   const { totalCount } = useCart()
 
+  useEffect(() => {
+    lastY.current = window.scrollY
+    const onScroll = () => {
+      const y = window.scrollY
+      const diff = y - lastY.current
+      if (y < 80) {
+        setHidden(false)
+      } else if (diff > 4) {
+        setHidden(true)
+      } else if (diff < -4) {
+        setHidden(false)
+      }
+      lastY.current = y
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
   return (
-    <header className="navbar">
+    <header className={`navbar ${hidden && !open ? 'navbar-hidden' : ''}`}>
       <div className="container navbar-inner">
         <Link to="/" className="navbar-logo" onClick={() => setOpen(false)}>
           <img src={logo} alt="Honeybun Kidswear" />

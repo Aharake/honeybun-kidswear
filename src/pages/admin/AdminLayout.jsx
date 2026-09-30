@@ -1,4 +1,5 @@
-import { NavLink, Outlet, useNavigate } from 'react-router-dom'
+import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
+import { ArrowLeft } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import './Admin.css'
 
@@ -32,6 +33,9 @@ export default function AdminLayout() {
           ))}
         </nav>
         <p style={{ fontSize: '1.1rem', opacity: 0.6, padding: '0 12px 8px' }}>{user?.email}</p>
+        <Link to="/" className="admin-back-link">
+          <ArrowLeft size={16} /> Go back to website
+        </Link>
         <button className="admin-signout" onClick={handleSignOut}>Sign out</button>
       </aside>
 

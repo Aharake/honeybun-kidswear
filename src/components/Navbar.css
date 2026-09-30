@@ -4,6 +4,11 @@
   z-index: 40;
   background: var(--cream);
   border-bottom: 1.5px solid var(--border);
+  transition: transform 0.3s var(--ease);
+}
+
+.navbar-hidden {
+  transform: translateY(-100%);
 }
 
 .navbar-inner {
