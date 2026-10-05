@@ -264,6 +264,10 @@ alter table products add column if not exists product_sale_price numeric(10,2);
 -- { "https://…/photo.jpg": { "zoom": 1.4, "x": 0.5, "y": 0.3 } }
 alter table products add column if not exists image_adjust jsonb not null default '{}'::jsonb;
 
+-- Colours a product comes in (names from the admin's colour picker, e.g.
+-- {'Pink','Cream'}). Powers the colour filter in the shop.
+alter table products add column if not exists colors text[] not null default '{}'::text[];
+
 -- Discount codes ------------------------------------------------------------
 -- Not readable by shoppers at all (otherwise anyone could list every code).
 -- Shoppers only ever go through the two functions below.

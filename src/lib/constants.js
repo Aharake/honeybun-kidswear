@@ -45,3 +45,25 @@ export function totalStock(sizeStock) {
 export function inStockSizes(sizeStock) {
   return sortSizeStock(sizeStock).filter((s) => s.stock > 0)
 }
+
+// Colours the admin can tag a product with. The name is what gets stored and
+// what shoppers filter by; the hex is only for the swatch.
+export const COLOR_OPTIONS = [
+  { name: 'White', hex: '#FFFFFF' },
+  { name: 'Cream', hex: '#F5EBDD' },
+  { name: 'Beige', hex: '#D9C3A5' },
+  { name: 'Brown', hex: '#7A5538' },
+  { name: 'Black', hex: '#2B2522' },
+  { name: 'Grey', hex: '#A3A3A3' },
+  { name: 'Red', hex: '#D64545' },
+  { name: 'Pink', hex: '#F2A7B8' },
+  { name: 'Orange', hex: '#EE8A3C' },
+  { name: 'Yellow', hex: '#F3D25C' },
+  { name: 'Green', hex: '#6FA66B' },
+  { name: 'Mint', hex: '#B5E0CC' },
+  { name: 'Blue', hex: '#5E8FD0' },
+  { name: 'Navy', hex: '#26365E' },
+  { name: 'Lilac', hex: '#BBA6DD' },
+]
+
+export const colorHex = (name) => COLOR_OPTIONS.find((c) => c.name === name)?.hex || '#CCCCCC'

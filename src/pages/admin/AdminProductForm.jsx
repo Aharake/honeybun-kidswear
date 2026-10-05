@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { X } from 'lucide-react'
 import { supabase, slugify, PRODUCT_IMAGES_BUCKET } from '../../lib/supabaseClient'
-import { SIZE_OPTIONS, sortSizeStock } from '../../lib/constants'
+import { COLOR_OPTIONS, SIZE_OPTIONS, sortSizeStock } from '../../lib/constants'
 import { getAdjust, isAdjusted } from '../../lib/imageAdjust'
 import PhotoAdjuster from '../../components/PhotoAdjuster'
 import './Admin.css'
@@ -15,6 +15,7 @@ const EMPTY = {
   compare_at_price: '',
   category: '',
   size_stock: [],
+  colors: [],
   images: [],
   image_adjust: {},
   is_active: true,
@@ -22,6 +23,7 @@ const EMPTY = {
   product_sale_price: '',
   hasSaleColumn: false,
   hasAdjustColumn: false,
+  hasColorsColumn: false,
 }
 
 export default function AdminProductForm() {
@@ -71,6 +73,8 @@ export default function AdminProductForm() {
             hasSaleColumn: 'product_sale_price' in data,
             image_adjust: data.image_adjust || {},
             hasAdjustColumn: 'image_adjust' in data,
+            colors: data.colors || [],
+            hasColorsColumn: 'colors' in data,
           })
         }
         setLoading(false)
@@ -95,6 +99,13 @@ export default function AdminProductForm() {
         : sortSizeStock([...f.size_stock, { size, stock: 0 }])
       return { ...f, size_stock: next }
     })
+  }
+
+  const toggleColor = (name) => {
+    setForm((f) => ({
+      ...f,
+      colors: f.colors.includes(name) ? f.colors.filter((c) => c !== name) : [...f.colors, name],
+    }))
   }
 
   const addCustomSize = () => {
@@ -189,6 +200,7 @@ export default function AdminProductForm() {
       compare_at_price: form.compare_at_price ? Number(form.compare_at_price) : null,
       category: form.category,
       size_stock: form.size_stock,
+      ...(form.colors.length > 0 || form.hasColorsColumn ? { colors: form.colors } : {}),
       images: form.images,
       is_active: form.is_active,
       ...(form.saleOn || form.hasSaleColumn
@@ -314,6 +326,33 @@ export default function AdminProductForm() {
           </select>
           {collections.length === 0 && (
             <p className="admin-field-hint">Create a collection first under Collections in the sidebar.</p>
+          )}
+        </div>
+
+        <div className="field">
+          <label>Colour</label>
+          <p className="admin-field-hint">Tap every colour this product comes in. Shoppers can filter the shop by colour.</p>
+          <div className="admin-color-picker">
+            {COLOR_OPTIONS.map((c) => {
+              const active = form.colors.includes(c.name)
+              return (
+                <button
+                  type="button"
+                  key={c.name}
+                  className={`admin-color-option ${active ? 'is-active' : ''}`}
+                  onClick={() => toggleColor(c.name)}
+                  aria-pressed={active}
+                >
+                  <span className="color-swatch" style={{ background: c.hex }} />
+                  {c.name}
+                </button>
+              )
+            })}
+          </div>
+          {form.colors.length > 0 && (
+            <p className="admin-field-hint" style={{ marginTop: 8, marginBottom: 0 }}>
+              Selected: {form.colors.map((c) => c).join(', ')}
+            </p>
           )}
         </div>
 

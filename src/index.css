@@ -227,3 +227,12 @@ input, textarea, select {
     grid-template-columns: repeat(4, 1fr);
   }
 }
+
+.color-swatch {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(74, 58, 46, 0.25);
+  flex-shrink: 0;
+}

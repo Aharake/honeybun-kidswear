@@ -638,3 +638,28 @@
     grid-template-columns: 1fr;
   }
 }
+
+.admin-color-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.admin-color-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px 6px 8px;
+  border-radius: 999px;
+  border: 1.5px solid var(--border);
+  background: var(--bg-elev);
+  color: var(--brown);
+  font-weight: 600;
+  font-size: 1.2rem;
+}
+
+.admin-color-option.is-active {
+  border-color: var(--brown);
+  background: var(--honey-tint);
+  box-shadow: 0 0 0 1.5px var(--brown);
+}

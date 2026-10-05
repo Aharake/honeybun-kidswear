@@ -5,7 +5,7 @@ import { supabase } from '../lib/supabaseClient'
 import { useCart } from '../context/CartContext'
 import { useSale } from '../context/SaleContext'
 import { getPricing } from '../lib/pricing'
-import { sortSizeStock, totalStock } from '../lib/constants'
+import { colorHex, sortSizeStock, totalStock } from '../lib/constants'
 import ImageCarousel from '../components/ImageCarousel'
 import './ProductDetail.css'
 
@@ -102,6 +102,20 @@ export default function ProductDetail() {
         </div>
 
         {product.description && <p className="product-detail-description">{product.description}</p>}
+
+        {product.colors?.length > 0 && (
+          <div className="product-detail-colors">
+            <p className="field-label">Colour</p>
+            <div className="product-detail-color-list">
+              {product.colors.map((name) => (
+                <span key={name} className="product-detail-color">
+                  <span className="color-swatch" style={{ background: colorHex(name) }} />
+                  {name}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
 
         {sizeStock.length > 0 && (
           <div className="product-detail-sizes">

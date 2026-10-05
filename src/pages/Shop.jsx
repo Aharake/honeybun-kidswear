@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom'
 import { Search } from 'lucide-react'
 import { supabase } from '../lib/supabaseClient'
 import { useCollections } from '../hooks/useCollections'
+import { COLOR_OPTIONS } from '../lib/constants'
 import { useSale } from '../context/SaleContext'
 import ProductCard from '../components/ProductCard'
 import './Shop.css'
@@ -11,11 +12,27 @@ export default function Shop() {
   const [searchParams, setSearchParams] = useSearchParams()
   const category = searchParams.get('category') || ''
   const onSaleOnly = searchParams.get('sale') === '1'
+  const color = searchParams.get('color') || ''
   const { sale } = useSale()
   const [query, setQuery] = useState(searchParams.get('q') || '')
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
+  const [usedColors, setUsedColors] = useState([])
   const { collections } = useCollections()
+
+  // Only offer colours that at least one live product actually has. If the
+  // database has no colours column yet this errors and the filter just hides.
+  useEffect(() => {
+    supabase
+      .from('products')
+      .select('colors')
+      .eq('is_active', true)
+      .then(({ data, error }) => {
+        if (error) return
+        const used = new Set((data || []).flatMap((p) => p.colors || []))
+        setUsedColors(COLOR_OPTIONS.filter((c) => used.has(c.name)))
+      })
+  }, [])
 
   useEffect(() => {
     let active = true
@@ -23,6 +40,7 @@ export default function Shop() {
 
     let request = supabase.from('products').select('*').eq('is_active', true)
     if (category) request = request.eq('category', category)
+    if (color) request = request.contains('colors', [color])
     if (onSaleOnly) request = request.or('on_sale.eq.true,product_sale_price.not.is.null')
     const q = searchParams.get('q')
     if (q) request = request.or(`name.ilike.%${q}%,description.ilike.%${q}%`)
@@ -38,7 +56,7 @@ export default function Shop() {
     return () => {
       active = false
     }
-  }, [category, onSaleOnly, searchParams])
+  }, [category, onSaleOnly, color, searchParams])
 
   const handleSearch = (e) => {
     e.preventDefault()
@@ -53,6 +71,13 @@ export default function Shop() {
     if (cat) next.set('category', cat)
     else next.delete('category')
     next.delete('sale')
+    setSearchParams(next)
+  }
+
+  const setColor = (name) => {
+    const next = new URLSearchParams(searchParams)
+    if (name && name !== color) next.set('color', name)
+    else next.delete('color')
     setSearchParams(next)
   }
 
@@ -104,6 +129,29 @@ export default function Shop() {
           </button>
         ))}
       </div>
+
+      {usedColors.length > 0 && (
+        <div className="shop-color-filter">
+          <span className="shop-color-label">Colour</span>
+          {usedColors.map((c) => (
+            <button
+              key={c.name}
+              className={`color-dot ${color === c.name ? 'is-active' : ''}`}
+              onClick={() => setColor(c.name)}
+              aria-label={`Filter by ${c.name}`}
+              aria-pressed={color === c.name}
+              title={c.name}
+            >
+              <span className="color-swatch" style={{ background: c.hex }} />
+            </button>
+          ))}
+          {color && (
+            <button className="color-clear" onClick={() => setColor('')}>
+              {color} · Clear
+            </button>
+          )}
+        </div>
+      )}
 
       {loading ? (
         <p className="shop-empty">Loading products…</p>

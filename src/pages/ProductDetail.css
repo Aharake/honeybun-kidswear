@@ -151,3 +151,23 @@
     grid-template-columns: 1fr 1fr;
   }
 }
+
+.product-detail-colors {
+  margin-top: 20px;
+}
+
+.product-detail-color-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.product-detail-color {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--brown);
+}
