@@ -49,7 +49,7 @@ export default function AdminCollections() {
         </Link>
       </div>
       <p className="admin-field-hint" style={{ marginBottom: 16 }}>
-        Collections group your products (like Girls or Boys). They appear on the homepage, the shop filters, and the footer.
+        Collections group your products (like Girls or Boys). They appear on the homepage (unless you untick "Show on the home screen"), the shop filters, and the footer.
       </p>
 
       {loading ? (
@@ -83,6 +83,9 @@ export default function AdminCollections() {
                     <span className={`badge ${c.is_active ? 'badge-delivered' : 'badge-cancelled'}`}>
                       {c.is_active ? 'Visible' : 'Hidden'}
                     </span>
+                    {c.is_active && c.show_on_home === false && (
+                      <span className="admin-stock-warning"> · not on home</span>
+                    )}
                   </td>
                   <td>
                     <Link to={`/admin/collections/${c.id}/edit`} className="admin-icon-btn" aria-label="Edit">

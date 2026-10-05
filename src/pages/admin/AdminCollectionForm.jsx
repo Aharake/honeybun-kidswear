@@ -5,7 +5,7 @@ import { supabase, slugify, PRODUCT_IMAGES_BUCKET } from '../../lib/supabaseClie
 import { collectionImage } from '../../lib/collectionImages'
 import './Admin.css'
 
-const EMPTY = { name: '', slug: '', tagline: '', image_url: '', sort_order: 0, is_active: true }
+const EMPTY = { name: '', slug: '', tagline: '', image_url: '', sort_order: 0, is_active: true, show_on_home: true, hasHomeColumn: false }
 
 export default function AdminCollectionForm() {
   const { id } = useParams()
@@ -30,7 +30,7 @@ export default function AdminCollectionForm() {
         if (fetchError) {
           setError('Could not load collection.')
         } else {
-          setForm({ ...EMPTY, ...data, image_url: data.image_url || '' })
+          setForm({ ...EMPTY, ...data, image_url: data.image_url || '', hasHomeColumn: 'show_on_home' in data })
           setOriginalName(data.name)
         }
         setLoading(false)
@@ -77,6 +77,7 @@ export default function AdminCollectionForm() {
       image_url: form.image_url || null,
       sort_order: Number(form.sort_order) || 0,
       is_active: form.is_active,
+      ...(!form.show_on_home || form.hasHomeColumn ? { show_on_home: form.show_on_home } : {}),
     }
 
     const request = isEdit
@@ -87,7 +88,14 @@ export default function AdminCollectionForm() {
 
     if (saveError) {
       setSaving(false)
-      setError(saveError.message.includes('duplicate') ? 'A collection with this name or slug already exists.' : 'Could not save collection.')
+      console.error(saveError)
+      setError(
+        saveError.message.includes('duplicate')
+          ? 'A collection with this name or slug already exists.'
+          : /show_on_home/.test(saveError.message)
+          ? 'Your database is missing the "show on home screen" field. Run the latest schema.sql in Supabase (SQL Editor), then save again.'
+          : 'Could not save collection.'
+      )
       return
     }
 
@@ -154,6 +162,14 @@ export default function AdminCollectionForm() {
             <label htmlFor="is_active" style={{ margin: 0 }}>Visible in shop</label>
           </div>
         </div>
+
+        <div className="field admin-checkbox-field">
+          <input id="show_on_home" name="show_on_home" type="checkbox" checked={form.show_on_home} onChange={handleChange} style={{ width: 'auto' }} />
+          <label htmlFor="show_on_home" style={{ margin: 0 }}>Show on the home screen</label>
+        </div>
+        <p className="admin-field-hint" style={{ marginTop: -8 }}>
+          Untick to keep this collection in the shop and footer but leave it off the home screen's "Shop by collection" section.
+        </p>
 
         {error && <p className="checkout-error">{error}</p>}
 

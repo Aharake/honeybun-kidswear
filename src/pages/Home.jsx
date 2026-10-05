@@ -60,7 +60,8 @@ function NewsletterSignup() {
 export default function Home() {
   const [featured, setFeatured] = useState([])
   const [loading, setLoading] = useState(true)
-  const { collections } = useCollections()
+  const { collections: allCollections } = useCollections()
+  const collections = allCollections.filter((c) => c.show_on_home !== false)
   const { sale, maxPercent } = useSale()
 
   useEffect(() => {

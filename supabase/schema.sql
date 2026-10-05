@@ -196,6 +196,9 @@ create table if not exists collections (
   created_at timestamptz not null default now()
 );
 
+-- Lets the admin keep a collection in the shop but off the home screen.
+alter table collections add column if not exists show_on_home boolean not null default true;
+
 alter table collections enable row level security;
 
 drop policy if exists "Public can read active collections" on collections;
