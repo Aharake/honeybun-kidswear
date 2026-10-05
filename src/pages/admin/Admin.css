@@ -663,3 +663,51 @@
   background: var(--honey-tint);
   box-shadow: 0 0 0 1.5px var(--brown);
 }
+
+.admin-custom-color {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.admin-custom-color input[type='text'] {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border);
+  background: var(--bg-elev);
+  color: var(--text);
+}
+
+.admin-custom-color .btn {
+  padding: 8px 16px;
+  font-size: 1.3rem;
+}
+
+.admin-color-input {
+  width: 42px;
+  height: 38px;
+  padding: 2px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-elev);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.admin-color-delete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  color: var(--text-muted);
+}
+
+.admin-color-delete:hover {
+  background: var(--light-gray);
+  color: var(--dark-brown);
+}

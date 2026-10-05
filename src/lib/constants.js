@@ -65,5 +65,3 @@ export const COLOR_OPTIONS = [
   { name: 'Navy', hex: '#26365E' },
   { name: 'Lilac', hex: '#BBA6DD' },
 ]
-
-export const colorHex = (name) => COLOR_OPTIONS.find((c) => c.name === name)?.hex || '#CCCCCC'

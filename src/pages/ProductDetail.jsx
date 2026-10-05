@@ -5,7 +5,8 @@ import { supabase } from '../lib/supabaseClient'
 import { useCart } from '../context/CartContext'
 import { useSale } from '../context/SaleContext'
 import { getPricing } from '../lib/pricing'
-import { colorHex, sortSizeStock, totalStock } from '../lib/constants'
+import { sortSizeStock, totalStock } from '../lib/constants'
+import { useColors } from '../hooks/useColors'
 import ImageCarousel from '../components/ImageCarousel'
 import './ProductDetail.css'
 
@@ -18,6 +19,7 @@ export default function ProductDetail() {
   const [product, setProduct] = useState(null)
   const [loading, setLoading] = useState(true)
   const [size, setSize] = useState('')
+  const { hexFor } = useColors()
   const [qty, setQty] = useState(1)
   const [added, setAdded] = useState(false)
 
@@ -109,7 +111,7 @@ export default function ProductDetail() {
             <div className="product-detail-color-list">
               {product.colors.map((name) => (
                 <span key={name} className="product-detail-color">
-                  <span className="color-swatch" style={{ background: colorHex(name) }} />
+                  <span className="color-swatch" style={{ background: hexFor(name) }} />
                   {name}
                 </span>
               ))}

@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { X } from 'lucide-react'
 import { supabase, slugify, PRODUCT_IMAGES_BUCKET } from '../../lib/supabaseClient'
-import { COLOR_OPTIONS, SIZE_OPTIONS, sortSizeStock } from '../../lib/constants'
+import { SIZE_OPTIONS, sortSizeStock } from '../../lib/constants'
+import { useColors } from '../../hooks/useColors'
 import { getAdjust, isAdjusted } from '../../lib/imageAdjust'
 import PhotoAdjuster from '../../components/PhotoAdjuster'
 import './Admin.css'
@@ -40,6 +41,11 @@ export default function AdminProductForm() {
   const [adjusting, setAdjusting] = useState(null)
   const [customSize, setCustomSize] = useState('')
   const [customError, setCustomError] = useState('')
+  const { palette, reload: reloadColors } = useColors()
+  const [newColorName, setNewColorName] = useState('')
+  const [newColorHex, setNewColorHex] = useState('#9CAF88')
+  const [colorError, setColorError] = useState('')
+  const [addingColor, setAddingColor] = useState(false)
 
   useEffect(() => {
     supabase
@@ -106,6 +112,50 @@ export default function AdminProductForm() {
       ...f,
       colors: f.colors.includes(name) ? f.colors.filter((c) => c !== name) : [...f.colors, name],
     }))
+  }
+
+  const addCustomColor = async () => {
+    const name = newColorName.trim().replace(/\s+/g, ' ')
+    if (!name) {
+      setColorError('Give the colour a name first.')
+      return
+    }
+    if (name.length > 20) {
+      setColorError('Keep the name short — 20 characters or fewer.')
+      return
+    }
+    if (palette.some((c) => c.name.toLowerCase() === name.toLowerCase())) {
+      setColorError(`"${name}" is already in the list.`)
+      return
+    }
+    setColorError('')
+    setAddingColor(true)
+    const { error: insertError } = await supabase.from('custom_colors').insert([{ name, hex: newColorHex.toUpperCase() }])
+    if (insertError) {
+      console.error(insertError)
+      setColorError(
+        insertError.code === '42P01' || /custom_colors/.test(insertError.message)
+          ? 'Your database is missing the custom colours table. Run the latest schema.sql in Supabase (SQL Editor), then try again.'
+          : 'Could not add that colour.'
+      )
+      setAddingColor(false)
+      return
+    }
+    await reloadColors()
+    setForm((f) => ({ ...f, colors: [...f.colors, name] }))
+    setNewColorName('')
+    setAddingColor(false)
+  }
+
+  const deleteCustomColor = async (name) => {
+    if (!window.confirm(`Remove "${name}" from your colour list? Products already tagged with it keep the name but show a grey swatch.`)) return
+    const { error: deleteError } = await supabase.from('custom_colors').delete().eq('name', name)
+    if (deleteError) {
+      setColorError('Could not remove that colour.')
+      return
+    }
+    setForm((f) => ({ ...f, colors: f.colors.filter((c) => c !== name) }))
+    reloadColors()
   }
 
   const addCustomSize = () => {
@@ -333,7 +383,7 @@ export default function AdminProductForm() {
           <label>Colour</label>
           <p className="admin-field-hint">Tap every colour this product comes in. Shoppers can filter the shop by colour.</p>
           <div className="admin-color-picker">
-            {COLOR_OPTIONS.map((c) => {
+            {palette.map((c) => {
               const active = form.colors.includes(c.name)
               return (
                 <button
@@ -345,10 +395,55 @@ export default function AdminProductForm() {
                 >
                   <span className="color-swatch" style={{ background: c.hex }} />
                   {c.name}
+                  {c.custom && (
+                    <span
+                      role="button"
+                      className="admin-color-delete"
+                      aria-label={`Remove ${c.name} from the colour list`}
+                      title="Remove from your colour list"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        deleteCustomColor(c.name)
+                      }}
+                    >
+                      <X size={11} />
+                    </span>
+                  )}
                 </button>
               )
             })}
           </div>
+
+          <div className="admin-custom-color">
+            <input
+              type="color"
+              value={newColorHex}
+              onChange={(e) => setNewColorHex(e.target.value)}
+              aria-label="Pick a colour"
+              className="admin-color-input"
+            />
+            <input
+              type="text"
+              placeholder="Name your colour, e.g. Sage"
+              value={newColorName}
+              maxLength={20}
+              onChange={(e) => {
+                setNewColorName(e.target.value)
+                setColorError('')
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault()
+                  addCustomColor()
+                }
+              }}
+              aria-label="Colour name"
+            />
+            <button type="button" className="btn btn-secondary" onClick={addCustomColor} disabled={addingColor}>
+              {addingColor ? 'Adding…' : 'Add colour'}
+            </button>
+          </div>
+          {colorError && <p className="admin-stock-warning" style={{ marginTop: 6 }}>{colorError}</p>}
           {form.colors.length > 0 && (
             <p className="admin-field-hint" style={{ marginTop: 8, marginBottom: 0 }}>
               Selected: {form.colors.map((c) => c).join(', ')}

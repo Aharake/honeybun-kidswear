@@ -268,6 +268,29 @@ alter table products add column if not exists image_adjust jsonb not null defaul
 -- {'Pink','Cream'}). Powers the colour filter in the shop.
 alter table products add column if not exists colors text[] not null default '{}'::text[];
 
+-- Colours the admin adds on top of the built-in ones. Shoppers can read them
+-- (so the swatch shows the right colour); only the admin can change them.
+create table if not exists custom_colors (
+  id uuid primary key default gen_random_uuid(),
+  name text not null unique,
+  hex text not null check (hex ~ '^#[0-9A-Fa-f]{6}$'),
+  created_at timestamptz not null default now()
+);
+
+alter table custom_colors enable row level security;
+
+drop policy if exists "Public can read custom colors" on custom_colors;
+create policy "Public can read custom colors" on custom_colors
+  for select to anon, authenticated using (true);
+
+drop policy if exists "Authenticated can insert custom colors" on custom_colors;
+create policy "Authenticated can insert custom colors" on custom_colors
+  for insert to authenticated with check (true);
+
+drop policy if exists "Authenticated can delete custom colors" on custom_colors;
+create policy "Authenticated can delete custom colors" on custom_colors
+  for delete to authenticated using (true);
+
 -- Discount codes ------------------------------------------------------------
 -- Not readable by shoppers at all (otherwise anyone could list every code).
 -- Shoppers only ever go through the two functions below.

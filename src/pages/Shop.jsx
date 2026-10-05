@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom'
 import { Search } from 'lucide-react'
 import { supabase } from '../lib/supabaseClient'
 import { useCollections } from '../hooks/useCollections'
-import { COLOR_OPTIONS } from '../lib/constants'
+import { useColors } from '../hooks/useColors'
 import { useSale } from '../context/SaleContext'
 import ProductCard from '../components/ProductCard'
 import './Shop.css'
@@ -17,7 +17,8 @@ export default function Shop() {
   const [query, setQuery] = useState(searchParams.get('q') || '')
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
-  const [usedColors, setUsedColors] = useState([])
+  const [usedNames, setUsedNames] = useState([])
+  const { palette } = useColors()
   const { collections } = useCollections()
 
   // Only offer colours that at least one live product actually has. If the
@@ -29,8 +30,7 @@ export default function Shop() {
       .eq('is_active', true)
       .then(({ data, error }) => {
         if (error) return
-        const used = new Set((data || []).flatMap((p) => p.colors || []))
-        setUsedColors(COLOR_OPTIONS.filter((c) => used.has(c.name)))
+        setUsedNames([...new Set((data || []).flatMap((p) => p.colors || []))])
       })
   }, [])
 
@@ -57,6 +57,8 @@ export default function Shop() {
       active = false
     }
   }, [category, onSaleOnly, color, searchParams])
+
+  const usedColors = palette.filter((c) => usedNames.includes(c.name))
 
   const handleSearch = (e) => {
     e.preventDefault()
