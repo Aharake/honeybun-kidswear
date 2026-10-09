@@ -1,4 +1,5 @@
 import { Link, useLocation, useParams } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 import { CheckCircle2 } from 'lucide-react'
 import './OrderConfirmation.css'
 
@@ -6,6 +7,7 @@ export default function OrderConfirmation() {
   const { orderNumber } = useParams()
   const location = useLocation()
   const order = location.state?.order
+  const { user } = useAuth()
 
   return (
     <div className="container confirmation-page">
@@ -46,6 +48,12 @@ export default function OrderConfirmation() {
       ) : (
         <p className="confirmation-sub">
           Your order was placed successfully. Save your order number for reference — we'll be in touch to confirm delivery.
+        </p>
+      )}
+
+      {user && order?.user_id && (
+        <p className="confirmation-sub">
+          You can follow this order any time in <Link to="/account" style={{ fontWeight: 700 }}>your account</Link>.
         </p>
       )}
 

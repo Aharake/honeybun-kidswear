@@ -13,6 +13,8 @@ import Cart from './pages/Cart'
 import Checkout from './pages/Checkout'
 import OrderConfirmation from './pages/OrderConfirmation'
 import Contact from './pages/Contact'
+import Account from './pages/Account'
+import ResetPassword from './pages/ResetPassword'
 import NotFound from './pages/NotFound'
 
 import AdminLogin from './pages/admin/AdminLogin'
@@ -43,6 +45,8 @@ function App() {
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/order-confirmation/:orderNumber" element={<OrderConfirmation />} />
               <Route path="/contact" element={<Contact />} />
+              <Route path="/account" element={<Account />} />
+              <Route path="/account/reset" element={<ResetPassword />} />
               <Route path="*" element={<NotFound />} />
             </Route>
 

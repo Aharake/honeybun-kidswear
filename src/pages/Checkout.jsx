@@ -1,6 +1,7 @@
-import { useRef, useState } from 'react'
-import { Navigate, useNavigate } from 'react-router-dom'
+import { useEffect, useRef, useState } from 'react'
+import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
+import { useAuth } from '../context/AuthContext'
 import { supabase, generateOrderNumber } from '../lib/supabaseClient'
 import './Checkout.css'
 
@@ -9,10 +10,31 @@ const EMPTY_FORM = { customer_name: '', email: '', phone: '', address: '', city:
 export default function Checkout() {
   const { items, subtotal, discount, discountAmount, total, removeCode, clearCart, checkStock } = useCart()
   const navigate = useNavigate()
+  const { user, accountsReady } = useAuth()
   const [form, setForm] = useState(EMPTY_FORM)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const orderPlaced = useRef(false)
+  const prefilled = useRef(null)
+
+  // Signed in: fill in the form from the account and their last delivery,
+  // without overwriting anything they've already typed.
+  useEffect(() => {
+    if (!user || !accountsReady || prefilled.current === user.id) return
+    prefilled.current = user.id
+    const fill = (values) =>
+      setForm((f) => Object.fromEntries(Object.entries(f).map(([k, v]) => [k, v || values[k] || ''])))
+    fill({ email: user.email, customer_name: user.user_metadata?.full_name })
+    supabase
+      .from('orders')
+      .select('customer_name, phone, address, city')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .then(({ data }) => {
+        if (data?.[0]) fill(data[0])
+      })
+  }, [user, accountsReady])
 
   if (items.length === 0 && !orderPlaced.current) {
     return <Navigate to="/cart" replace />
@@ -66,6 +88,7 @@ export default function Checkout() {
       total,
       status: 'pending',
       payment_method: 'cod',
+      ...(user && accountsReady ? { user_id: user.id } : {}),
       ...(discountAmount > 0 ? { discount_code: discount.code, discount_amount: discountAmount } : {}),
     }
 
@@ -99,6 +122,11 @@ export default function Checkout() {
     <div className="container checkout-page">
       <h1>Checkout</h1>
       <p className="checkout-sub">Pay with cash when your order arrives.</p>
+      {accountsReady && !user && (
+        <p className="checkout-account-hint">
+          Want to follow your order? <Link to="/account">Sign in or create an account</Link> first — or just check out as a guest.
+        </p>
+      )}
 
       <div className="checkout-layout">
         <form className="checkout-form" onSubmit={handleSubmit}>

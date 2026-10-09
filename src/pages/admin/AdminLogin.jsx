@@ -1,20 +1,37 @@
 import { useState } from 'react'
-import { Navigate, useLocation, useNavigate } from 'react-router-dom'
+import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import logo from '../../assets/logo.png'
 import './Admin.css'
 
 export default function AdminLogin() {
-  const { user, signIn } = useAuth()
-  const navigate = useNavigate()
+  const { user, signIn, signOut, roleChecked, isAdmin } = useAuth()
   const location = useLocation()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
-  if (user) {
+  if (user && roleChecked && isAdmin) {
     return <Navigate to={location.state?.from?.pathname || '/admin'} replace />
+  }
+
+  // Signed in with a shopper account, not an admin one.
+  if (user && roleChecked && !isAdmin) {
+    return (
+      <div className="admin-login-page">
+        <div className="admin-login-card">
+          <img src={logo} alt="Honeybun Kidswear" className="admin-login-logo" />
+          <h1>Not an admin account</h1>
+          <p className="admin-field-hint">
+            You're signed in as {user.email}, which is a shopper account. Sign out to log in with the admin account instead.
+          </p>
+          <button className="btn btn-primary" type="button" onClick={() => signOut()}>
+            Sign out
+          </button>
+        </div>
+      </div>
+    )
   }
 
   const handleSubmit = async (e) => {
@@ -27,7 +44,6 @@ export default function AdminLogin() {
       setError('Invalid email or password.')
       return
     }
-    navigate('/admin', { replace: true })
   }
 
   return (

@@ -40,11 +40,27 @@ order database, admin login, and photo storage. Do these steps once.
 
 ## 4. Create the admin account
 
-There is no public sign-up page — the admin account is created directly in Supabase:
+The admin account is created directly in Supabase:
 
-1. Open **Authentication** → **Users** → **Add user** → **Create new user**.
+1. Open **Authentication** -> **Users** -> **Add user** -> **Create new user**.
 2. Enter the email and password you'll log in with at `/admin/login`.
 3. Leave "Auto Confirm User" checked so it doesn't require an email confirmation step.
 
-That's it — you can now log in at `/admin/login`, add products with photos,
-and see orders/analytics as customers check out.
+Do this **before** you run `schema.sql` (step 2). When the schema first runs, it
+makes whoever already has an account the admin. If shoppers could sign up
+before that, they would be made admins too, so check **Authentication -> Users**
+lists only your account before running it.
+
+## 5. Shopper accounts
+
+Shoppers can create accounts at `/account` to track their orders and keep their
+bag on every device. Guests can still check out without one.
+
+- Only accounts on the `admins` table can open `/admin`. To add another admin:
+  `insert into admins (user_id) select id from auth.users where email = 'her@email.com';`
+- **Authentication -> URL Configuration:** set the Site URL to your domain and
+  add `https://yourdomain.com/**` under Redirect URLs (password-reset links use it).
+- **Authentication -> Providers -> Email:** "Confirm email" decides whether new
+  shoppers must click a link before signing in. Supabase's built-in mailer is
+  limited to a few emails an hour, so for real use set up your own sender under
+  **Authentication -> SMTP Settings** (e.g. Resend).

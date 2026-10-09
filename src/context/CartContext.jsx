@@ -1,5 +1,6 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import { useAuth } from './AuthContext'
 import { discountAmountFor, round2 } from '../lib/pricing'
 
 const CartContext = createContext(null)
@@ -55,10 +56,71 @@ function reconcile(lines, available) {
   return { next, issues }
 }
 
+// Combines the bag saved on the account with the one on this device. A line
+// in both keeps the larger quantity, so signing in on a second device never
+// doubles anything up.
+function mergeBags(remote, local) {
+  const merged = new Map()
+  ;[...remote, ...local].forEach((line) => {
+    if (!line || !line.productId) return
+    const key = lineKey(line.productId, line.size)
+    const have = merged.get(key)
+    merged.set(key, have ? { ...have, ...line, qty: Math.max(have.qty, line.qty) } : line)
+  })
+  return [...merged.values()]
+}
+
 export function CartProvider({ children }) {
   const [items, setItems] = useState(() => load(STORAGE_KEY, []))
   const [discount, setDiscount] = useState(() => load(DISCOUNT_KEY, null))
   const [stockNotice, setStockNotice] = useState('')
+  const { user, roleChecked, accountsReady } = useAuth()
+  const userId = user?.id ?? null
+  const syncedFor = useRef(null)
+  const previousUser = useRef(null)
+
+  // Signing in: pull the saved bag and merge it with this device's bag.
+  // Quietly does nothing until the database has shopper accounts switched on.
+  useEffect(() => {
+    if (!userId || !roleChecked || !accountsReady) return
+    let active = true
+    supabase
+      .from('carts')
+      .select('items')
+      .eq('user_id', userId)
+      .maybeSingle()
+      .then(({ data, error }) => {
+        if (!active || error) return
+        const remote = Array.isArray(data?.items) ? data.items : []
+        setItems((local) => mergeBags(remote, local))
+        syncedFor.current = userId
+      })
+    return () => {
+      active = false
+    }
+  }, [userId, roleChecked, accountsReady])
+
+  // Signed in: keep the saved bag up to date as it changes.
+  useEffect(() => {
+    if (!userId || syncedFor.current !== userId) return
+    const timer = setTimeout(() => {
+      supabase.from('carts').upsert({ user_id: userId, items, updated_at: new Date().toISOString() }).then(({ error }) => {
+        if (error) console.error('Could not save your bag:', error)
+      })
+    }, 700)
+    return () => clearTimeout(timer)
+  }, [items, userId])
+
+  // Signing out empties this device's bag (it stays saved on the account),
+  // so the next person on a shared phone doesn't see it.
+  useEffect(() => {
+    if (previousUser.current && !userId) {
+      syncedFor.current = null
+      setItems([])
+      setDiscount(null)
+    }
+    previousUser.current = userId
+  }, [userId])
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(items))

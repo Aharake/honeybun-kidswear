@@ -67,3 +67,17 @@
     grid-template-columns: 3fr 2fr;
   }
 }
+
+.checkout-account-hint {
+  margin: -8px 0 20px;
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  background: var(--honey-tint);
+  font-size: 1.3rem;
+  color: var(--brown);
+}
+
+.checkout-account-hint a {
+  color: var(--honey-hover);
+  font-weight: 700;
+}

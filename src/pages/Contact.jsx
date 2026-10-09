@@ -1,4 +1,5 @@
-import { Mail, MessageCircle, Camera } from 'lucide-react'
+import { MessageCircle, Camera } from 'lucide-react'
+import { INSTAGRAM_HANDLE, INSTAGRAM_LINK, WHATSAPP_DISPLAY, WHATSAPP_LINK } from '../lib/contact'
 import './Contact.css'
 
 export default function Contact() {
@@ -8,17 +9,13 @@ export default function Contact() {
       <p className="contact-sub">Questions about sizing, an order, or a custom request? We'd love to hear from you.</p>
 
       <div className="contact-cards">
-        <a href="mailto:hello@honeybunkidswear.com" className="contact-card">
-          <Mail size={26} />
-          <span>hello@honeybunkidswear.com</span>
-        </a>
-        <a href="https://wa.me/00000000000" target="_blank" rel="noopener noreferrer" className="contact-card">
+        <a href={WHATSAPP_LINK} target="_blank" rel="noopener noreferrer" className="contact-card">
           <MessageCircle size={26} />
-          <span>WhatsApp us</span>
+          <span>WhatsApp us · {WHATSAPP_DISPLAY}</span>
         </a>
-        <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="contact-card">
+        <a href={INSTAGRAM_LINK} target="_blank" rel="noopener noreferrer" className="contact-card">
           <Camera size={26} />
-          <span>@honeybunkidswear</span>
+          <span>@{INSTAGRAM_HANDLE}</span>
         </a>
       </div>
     </div>

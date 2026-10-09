@@ -61,6 +61,13 @@
   gap: 8px;
 }
 
+.navbar-account {
+  color: var(--brown);
+  display: none;
+  align-items: center;
+  gap: 8px;
+}
+
 .navbar-cart-label {
   display: none;
   font-weight: 600;
@@ -165,6 +172,9 @@
   }
   .navbar-cart-label {
     display: inline;
+  }
+  .navbar-account {
+    display: inline-flex;
   }
   .navbar-drawer-backdrop,
   .navbar-mobile {

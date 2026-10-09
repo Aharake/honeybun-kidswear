@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useCollections } from '../hooks/useCollections'
+import { INSTAGRAM_LINK, WHATSAPP_LINK } from '../lib/contact'
 import logo from '../assets/logo.png'
 import './Footer.css'
 
@@ -27,6 +28,9 @@ export default function Footer() {
           <Link to="/">Home</Link>
           <Link to="/shop">Shop all</Link>
           <Link to="/contact">Contact us</Link>
+          <a href={WHATSAPP_LINK} target="_blank" rel="noopener noreferrer">WhatsApp</a>
+          <a href={INSTAGRAM_LINK} target="_blank" rel="noopener noreferrer">Instagram</a>
+          <Link to="/account">My account</Link>
           <Link to="/admin/login">Admin</Link>
         </div>
       </div>

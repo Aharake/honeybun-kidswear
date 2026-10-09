@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
-import { Menu, X, ShoppingBag } from 'lucide-react'
+import { Menu, X, ShoppingBag, User } from 'lucide-react'
 import { useCart } from '../context/CartContext'
+import { useAuth } from '../context/AuthContext'
 import logo from '../assets/logo.png'
 import './Navbar.css'
 
@@ -16,6 +17,7 @@ export default function Navbar() {
   const [hidden, setHidden] = useState(false)
   const lastY = useRef(0)
   const { totalCount } = useCart()
+  const { user } = useAuth()
 
   useEffect(() => {
     lastY.current = window.scrollY
@@ -55,6 +57,10 @@ export default function Navbar() {
         </nav>
 
         <div className="navbar-right">
+          <Link to="/account" className="navbar-account" aria-label={user ? 'My account' : 'Sign in'}>
+            <User size={26} />
+            <span className="navbar-cart-label">{user ? 'Account' : 'Sign in'}</span>
+          </Link>
           <Link to="/cart" className="navbar-cart" aria-label="Bag">
             <ShoppingBag size={26} />
             <span className="navbar-cart-label">Bag</span>
@@ -94,6 +100,13 @@ export default function Navbar() {
             {link.label}
           </NavLink>
         ))}
+        <NavLink
+          to="/account"
+          className={({ isActive }) => `navbar-mobile-link ${isActive ? 'is-active' : ''}`}
+          onClick={() => setOpen(false)}
+        >
+          {user ? 'My account' : 'Sign in'}
+        </NavLink>
       </nav>
     </header>
   )

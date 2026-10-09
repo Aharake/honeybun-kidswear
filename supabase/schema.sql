@@ -3,6 +3,45 @@
 
 create extension if not exists "pgcrypto";
 
+-- Who is an admin -------------------------------------------------------
+-- Shoppers can now create accounts, and every account is a Supabase
+-- "authenticated" user. So "authenticated" no longer means "admin": the
+-- policies below check this list instead.
+--
+-- FIRST RUN ONLY: whoever already has an account when this runs (that is,
+-- you, before any shopper has signed up) is made an admin. Before running,
+-- open Authentication -> Users and make sure only your own admin account is
+-- listed. To add another admin later:
+--   insert into admins (user_id) select id from auth.users where email = 'her@email.com';
+
+create table if not exists admins (
+  user_id uuid primary key references auth.users (id) on delete cascade,
+  created_at timestamptz not null default now()
+);
+
+insert into admins (user_id)
+select id from auth.users
+where not exists (select 1 from admins);
+
+alter table admins enable row level security;
+
+-- Security definer so the check works inside other tables' policies.
+create or replace function is_admin()
+returns boolean
+language sql
+security definer
+stable
+set search_path = public
+as $$
+  select exists (select 1 from admins where user_id = auth.uid());
+$$;
+
+grant execute on function is_admin() to anon, authenticated;
+
+drop policy if exists "Admins can see themselves" on admins;
+create policy "Admins can see themselves" on admins
+  for select to authenticated using (user_id = auth.uid());
+
 -- Products -------------------------------------------------------------
 
 create table if not exists products (
@@ -47,23 +86,23 @@ alter table products enable row level security;
 
 drop policy if exists "Public can read active products" on products;
 create policy "Public can read active products" on products
-  for select to anon using (is_active = true);
+  for select to anon, authenticated using (is_active = true);
 
 drop policy if exists "Authenticated can read all products" on products;
 create policy "Authenticated can read all products" on products
-  for select to authenticated using (true);
+  for select to authenticated using (is_admin());
 
 drop policy if exists "Authenticated can insert products" on products;
 create policy "Authenticated can insert products" on products
-  for insert to authenticated with check (true);
+  for insert to authenticated with check (is_admin());
 
 drop policy if exists "Authenticated can update products" on products;
 create policy "Authenticated can update products" on products
-  for update to authenticated using (true);
+  for update to authenticated using (is_admin());
 
 drop policy if exists "Authenticated can delete products" on products;
 create policy "Authenticated can delete products" on products
-  for delete to authenticated using (true);
+  for delete to authenticated using (is_admin());
 
 -- Orders -----------------------------------------------------------------
 -- Note: there is intentionally NO public "select" policy on orders. Order
@@ -88,19 +127,28 @@ create table if not exists orders (
   created_at timestamptz not null default now()
 );
 
+-- The shopper's account, when they were signed in at checkout (guests: null).
+alter table orders add column if not exists user_id uuid references auth.users (id) on delete set null;
+create index if not exists orders_user_id_idx on orders (user_id);
+
 alter table orders enable row level security;
 
 drop policy if exists "Anyone can place an order" on orders;
 create policy "Anyone can place an order" on orders
-  for insert to anon, authenticated with check (true);
+  for insert to anon, authenticated
+  with check (user_id is null or user_id = auth.uid());
 
 drop policy if exists "Authenticated can read orders" on orders;
 create policy "Authenticated can read orders" on orders
-  for select to authenticated using (true);
+  for select to authenticated using (is_admin());
+
+drop policy if exists "Shoppers can read their own orders" on orders;
+create policy "Shoppers can read their own orders" on orders
+  for select to authenticated using (user_id = auth.uid());
 
 drop policy if exists "Authenticated can update orders" on orders;
 create policy "Authenticated can update orders" on orders
-  for update to authenticated using (true);
+  for update to authenticated using (is_admin());
 
 -- Stock deduction on checkout ---------------------------------------------
 -- Runs as the function owner (security definer) so a customer's anon key
@@ -149,15 +197,15 @@ create policy "Public read product images" on storage.objects
 
 drop policy if exists "Authenticated upload product images" on storage.objects;
 create policy "Authenticated upload product images" on storage.objects
-  for insert to authenticated with check (bucket_id = 'product-images');
+  for insert to authenticated with check (bucket_id = 'product-images' and is_admin());
 
 drop policy if exists "Authenticated update product images" on storage.objects;
 create policy "Authenticated update product images" on storage.objects
-  for update to authenticated using (bucket_id = 'product-images');
+  for update to authenticated using (bucket_id = 'product-images' and is_admin());
 
 drop policy if exists "Authenticated delete product images" on storage.objects;
 create policy "Authenticated delete product images" on storage.objects
-  for delete to authenticated using (bucket_id = 'product-images');
+  for delete to authenticated using (bucket_id = 'product-images' and is_admin());
 
 -- Newsletter signups ------------------------------------------------------
 -- No public select policy, same reasoning as orders: anyone can subscribe,
@@ -177,7 +225,7 @@ create policy "Anyone can subscribe" on newsletter_subscribers
 
 drop policy if exists "Authenticated can read subscribers" on newsletter_subscribers;
 create policy "Authenticated can read subscribers" on newsletter_subscribers
-  for select to authenticated using (true);
+  for select to authenticated using (is_admin());
 
 -- Collections ---------------------------------------------------------------
 -- Admin-managed product groupings (Girls, Boys, ...). products.category holds
@@ -203,23 +251,23 @@ alter table collections enable row level security;
 
 drop policy if exists "Public can read active collections" on collections;
 create policy "Public can read active collections" on collections
-  for select to anon using (is_active = true);
+  for select to anon, authenticated using (is_active = true);
 
 drop policy if exists "Authenticated can read all collections" on collections;
 create policy "Authenticated can read all collections" on collections
-  for select to authenticated using (true);
+  for select to authenticated using (is_admin());
 
 drop policy if exists "Authenticated can insert collections" on collections;
 create policy "Authenticated can insert collections" on collections
-  for insert to authenticated with check (true);
+  for insert to authenticated with check (is_admin());
 
 drop policy if exists "Authenticated can update collections" on collections;
 create policy "Authenticated can update collections" on collections
-  for update to authenticated using (true);
+  for update to authenticated using (is_admin());
 
 drop policy if exists "Authenticated can delete collections" on collections;
 create policy "Authenticated can delete collections" on collections
-  for delete to authenticated using (true);
+  for delete to authenticated using (is_admin());
 
 insert into collections (name, slug, tagline, sort_order)
 select * from (values
@@ -253,7 +301,7 @@ create policy "Anyone can read sale settings" on sale_settings
 
 drop policy if exists "Authenticated can update sale settings" on sale_settings;
 create policy "Authenticated can update sale settings" on sale_settings
-  for update to authenticated using (true);
+  for update to authenticated using (is_admin());
 
 alter table products add column if not exists on_sale boolean not null default false;
 alter table products add column if not exists sale_price numeric(10,2);
@@ -288,11 +336,11 @@ create policy "Public can read custom colors" on custom_colors
 
 drop policy if exists "Authenticated can insert custom colors" on custom_colors;
 create policy "Authenticated can insert custom colors" on custom_colors
-  for insert to authenticated with check (true);
+  for insert to authenticated with check (is_admin());
 
 drop policy if exists "Authenticated can delete custom colors" on custom_colors;
 create policy "Authenticated can delete custom colors" on custom_colors
-  for delete to authenticated using (true);
+  for delete to authenticated using (is_admin());
 
 -- Discount codes ------------------------------------------------------------
 -- Not readable by shoppers at all (otherwise anyone could list every code).
@@ -316,7 +364,7 @@ alter table discount_codes enable row level security;
 
 drop policy if exists "Authenticated manage discount codes" on discount_codes;
 create policy "Authenticated manage discount codes" on discount_codes
-  for all to authenticated using (true) with check (true);
+  for all to authenticated using (is_admin()) with check (is_admin());
 
 create or replace function validate_discount_code(p_code text, p_subtotal numeric)
 returns jsonb
@@ -368,3 +416,21 @@ grant execute on function redeem_discount_code(text) to anon, authenticated;
 
 alter table orders add column if not exists discount_code text;
 alter table orders add column if not exists discount_amount numeric(10,2) not null default 0;
+
+-- Saved bags ---------------------------------------------------------------
+-- A signed-in shopper's bag follows them from phone to laptop. One row per
+-- shopper; they can only ever see and change their own.
+
+create table if not exists carts (
+  user_id uuid primary key references auth.users (id) on delete cascade,
+  items jsonb not null default '[]'::jsonb,
+  updated_at timestamptz not null default now()
+);
+
+alter table carts enable row level security;
+
+drop policy if exists "Shoppers manage their own bag" on carts;
+create policy "Shoppers manage their own bag" on carts
+  for all to authenticated
+  using (user_id = auth.uid())
+  with check (user_id = auth.uid());
