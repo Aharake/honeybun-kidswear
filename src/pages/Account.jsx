@@ -20,14 +20,19 @@ const STATUS_TEXT = {
   cancelled: 'This order was cancelled. Message us on WhatsApp if you have any questions.',
 }
 
-function niceError(message = '') {
-  const m = message.toLowerCase()
+const EMAIL_LIMIT_MESSAGE =
+  "We can't send another confirmation email right now. Please try again in about an hour, or message us on WhatsApp and we'll help."
+
+function niceError(err) {
+  const m = String(err?.message || '').toLowerCase()
+  if (err?.code === 'over_email_send_rate_limit') return EMAIL_LIMIT_MESSAGE
   if (m.includes('invalid login')) return 'Wrong email or password.'
   if (m.includes('already registered') || m.includes('already been registered')) {
     return 'There is already an account with this email. Try signing in instead.'
   }
   if (m.includes('password') && m.includes('characters')) return 'Your password needs at least 6 characters.'
   if (m.includes('email not confirmed')) return 'Please confirm your email first. Check your inbox for our message.'
+  if (m.includes('email rate limit')) return EMAIL_LIMIT_MESSAGE
   if (m.includes('rate limit') || m.includes('too many')) return 'Too many tries. Please wait a few minutes and try again.'
   return 'Something went wrong. Please try again.'
 }
@@ -56,13 +61,13 @@ function AuthForms() {
 
     if (mode === 'signin') {
       const { error: err } = await signIn(email.trim(), password)
-      if (err) setError(niceError(err.message))
+      if (err) setError(niceError(err))
     } else if (mode === 'signup') {
       if (password.length < 6) {
         setError('Your password needs at least 6 characters.')
       } else {
         const { data, error: err } = await signUp(email.trim(), password, name.trim())
-        if (err) setError(niceError(err.message))
+        if (err) setError(niceError(err))
         else if (!data.session) {
           setNotice('Almost there! We sent a confirmation link to your email. Open it, then sign in.')
           setMode('signin')
@@ -70,7 +75,7 @@ function AuthForms() {
       }
     } else {
       const { error: err } = await sendPasswordReset(email.trim())
-      if (err) setError(niceError(err.message))
+      if (err) setError(niceError(err))
       else setNotice('If there is an account with that email, a reset link is on its way.')
     }
     setBusy(false)
