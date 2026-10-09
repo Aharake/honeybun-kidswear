@@ -614,7 +614,7 @@
 
 @media (min-width: 900px) {
   .admin-stat-grid {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
   }
 }
 
@@ -710,4 +710,20 @@
 .admin-color-delete:hover {
   background: var(--light-gray);
   color: var(--dark-brown);
+}
+
+.admin-section-title {
+  font-size: 1.8rem;
+  margin: 8px 0 14px;
+}
+
+.admin-stat-note {
+  font-size: 1.15rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.admin-stat-card-featured {
+  background: var(--honey-tint);
+  border: 1.5px solid var(--honey);
 }

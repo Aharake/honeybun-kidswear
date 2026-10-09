@@ -104,7 +104,7 @@ export default function Home() {
           </h1>
           <p className="hero-photo-sub hero-anim" style={{ animationDelay: '180ms' }}>
             Soft fabrics, playful prints, and cozy fits — made for puddles, playgrounds, and everything in between.
-            Sized newborn to 6 years.
+            Sized 1 to 12 years.
           </p>
           <div className="hero-photo-ctas hero-anim" style={{ animationDelay: '270ms' }}>
             <Link to="/shop" className="btn btn-primary">Shop the collection →</Link>

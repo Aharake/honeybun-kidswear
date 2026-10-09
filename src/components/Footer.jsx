@@ -11,7 +11,7 @@ export default function Footer() {
       <div className="container footer-inner">
         <div className="footer-brand">
           <img src={logo} alt="Honeybun Kidswear" className="footer-logo" />
-          <p className="footer-tagline">Sweet, comfy clothing for little ones — sized newborn to 6 years.</p>
+          <p className="footer-tagline">Sweet, comfy clothing for little ones — sized 1 to 12 years.</p>
         </div>
 
         <div className="footer-col">

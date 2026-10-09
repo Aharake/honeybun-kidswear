@@ -3,7 +3,7 @@ import Marquee from './Marquee'
 import Navbar from './Navbar'
 import Footer from './Footer'
 
-const ANNOUNCEMENTS = ['Cash on delivery', 'Newborn to 6 years', 'New arrivals every week']
+const ANNOUNCEMENTS = ['Cash on delivery', '1 to 12 years', 'New arrivals every week']
 
 export default function Layout() {
   return (

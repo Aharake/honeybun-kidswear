@@ -97,7 +97,7 @@ export default function Shop() {
           <h1>Shop All</h1>
           {!loading && (
             <p className="shop-header-sub">
-              {products.length} {products.length === 1 ? 'piece' : 'pieces'} · sized newborn to 6 years
+              {products.length} {products.length === 1 ? 'piece' : 'pieces'} · sized 1 to 12 years
             </p>
           )}
         </div>
