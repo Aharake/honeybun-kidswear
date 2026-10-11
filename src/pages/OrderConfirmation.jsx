@@ -1,5 +1,6 @@
 import { Link, useLocation, useParams } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { POLICY_SHORT } from '../lib/policy'
 import { CheckCircle2 } from 'lucide-react'
 import './OrderConfirmation.css'
 
@@ -56,6 +57,10 @@ export default function OrderConfirmation() {
           You can follow this order any time in <Link to="/account" style={{ fontWeight: 700 }}>your account</Link>.
         </p>
       )}
+
+      <p className="policy-note" style={{ textAlign: 'center' }}>
+        {POLICY_SHORT} <Link to="/exchanges">Details</Link>
+      </p>
 
       <Link to="/shop" className="btn btn-primary">Continue shopping</Link>
     </div>

@@ -11,8 +11,10 @@ export const SIZE_OPTIONS = [
   '7-8Y',
   '8-9Y',
   '9-10Y',
+  '10-11Y',
   '11-12Y',
   '12-13Y',
+  '13-14Y',
 ]
 
 // Turns a size label into a rough age in months so any size, including

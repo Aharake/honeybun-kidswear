@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
 import { useAuth } from '../context/AuthContext'
+import { POLICY_SHORT } from '../lib/policy'
 import { supabase, generateOrderNumber } from '../lib/supabaseClient'
 import './Checkout.css'
 
@@ -164,6 +165,10 @@ export default function Checkout() {
           </div>
 
           {error && <p className="checkout-error">{error}</p>}
+
+          <p className="policy-note">
+            {POLICY_SHORT} <Link to="/exchanges">Details</Link>
+          </p>
 
           <button className="btn btn-primary checkout-submit" type="submit" disabled={submitting}>
             {submitting ? 'Placing order…' : `Place order — Cash on delivery`}

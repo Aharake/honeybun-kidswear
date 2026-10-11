@@ -12,7 +12,7 @@ export default function Footer() {
       <div className="container footer-inner">
         <div className="footer-brand">
           <img src={logo} alt="Honeybun Kidswear" className="footer-logo" />
-          <p className="footer-tagline">Sweet, comfy clothing for little ones — sized 1 to 12 years.</p>
+          <p className="footer-tagline">Sweet, comfy clothing for little ones — sized 1 to 14 years.</p>
         </div>
 
         <div className="footer-col">
@@ -28,6 +28,7 @@ export default function Footer() {
           <Link to="/">Home</Link>
           <Link to="/shop">Shop all</Link>
           <Link to="/contact">Contact us</Link>
+          <Link to="/exchanges">Exchange policy</Link>
           <a href={WHATSAPP_LINK} target="_blank" rel="noopener noreferrer">WhatsApp</a>
           <a href={INSTAGRAM_LINK} target="_blank" rel="noopener noreferrer">Instagram</a>
           <Link to="/account">My account</Link>

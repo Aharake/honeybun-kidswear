@@ -98,6 +98,9 @@ export function renderCustomerEmail(order) {
             <p style="margin:0;color:${BROWN};font-size:14px;line-height:1.5;">
               Questions? Just reply to this email or message us on WhatsApp.
             </p>
+            <p style="margin:12px 0 0;color:${MUTED};font-size:13px;line-height:1.5;">
+              No refunds. Exchanges are welcome within 7 days of delivery. Message us on WhatsApp with your order number.
+            </p>
             <p style="margin:14px 0 0;color:${BROWN};font-size:14px;">Sweet outfits for your little honey,<br><strong>Honeybun Kidswear</strong></p>
           </td></tr>
         </table>
@@ -115,6 +118,8 @@ export function renderCustomerEmail(order) {
     `Total (cash on delivery): ${money(order.total)}`,
     '',
     `Delivering to: ${order.address}, ${order.city}`,
+    '',
+    'No refunds. Exchanges are welcome within 7 days of delivery. Message us on WhatsApp with your order number.',
     '',
     'Honeybun Kidswear',
   ]

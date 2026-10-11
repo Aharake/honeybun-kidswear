@@ -7,6 +7,7 @@ import { useSale } from '../context/SaleContext'
 import { getPricing } from '../lib/pricing'
 import { sortSizeStock, totalStock } from '../lib/constants'
 import { useColors } from '../hooks/useColors'
+import { POLICY_SHORT } from '../lib/policy'
 import ImageCarousel from '../components/ImageCarousel'
 import './ProductDetail.css'
 
@@ -183,6 +184,10 @@ export default function ProductDetail() {
             View cart
           </button>
         )}
+
+        <p className="policy-note">
+          {POLICY_SHORT} <Link to="/exchanges">Details</Link>
+        </p>
       </div>
     </div>
   )
