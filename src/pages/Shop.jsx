@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { Search } from 'lucide-react'
+import { Search, SlidersHorizontal, X } from 'lucide-react'
 import { supabase } from '../lib/supabaseClient'
 import { sizeRank, totalStock } from '../lib/constants'
 import { useCollections } from '../hooks/useCollections'
@@ -23,6 +23,7 @@ export default function Shop() {
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const [available, setAvailable] = useState([])
+  const [filterOpen, setFilterOpen] = useState(false)
   const { palette } = useColors()
   const { collections } = useCollections()
 
@@ -92,9 +93,22 @@ export default function Shop() {
     }
   }, [available, palette])
 
+  useEffect(() => {
+    if (!filterOpen) return
+    const onKey = (e) => e.key === 'Escape' && setFilterOpen(false)
+    document.addEventListener('keydown', onKey)
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.removeEventListener('keydown', onKey)
+      document.body.style.overflow = ''
+    }
+  }, [filterOpen])
+
   // Picking an age or a colour means "show me what I can buy": the list keeps
   // only products that are in stock in that age, or in stock at all for a colour.
   const filtering = Boolean(size || color)
+  const activeCount = (size ? 1 : 0) + (color ? 1 : 0)
+  const hasFilterOptions = sizeOptions.length > 0 || colorOptions.length > 0
   const visible = useMemo(
     () =>
       products.filter(
@@ -163,75 +177,123 @@ export default function Shop() {
         </form>
       </div>
 
-      <div className="shop-filters">
-        <button className={`filter-pill ${!category && !onSaleOnly ? 'is-active' : ''}`} onClick={() => setCategory('')}>
-          All
-        </button>
-        {sale?.is_active && (
-          <button className={`filter-pill filter-pill-sale ${onSaleOnly ? 'is-active' : ''}`} onClick={showSale}>
-            Sale
+      <div className="shop-toolbar">
+        {hasFilterOptions && (
+          <button
+            className={`filter-button ${filtering ? 'is-active' : ''}`}
+            onClick={() => setFilterOpen(true)}
+            aria-haspopup="dialog"
+          >
+            <SlidersHorizontal size={16} />
+            Filter
+            {activeCount > 0 && <span className="filter-button-badge">{activeCount}</span>}
           </button>
         )}
-        {collections.map((col) => (
-          <button
-            key={col.id}
-            className={`filter-pill ${category === col.name ? 'is-active' : ''}`}
-            onClick={() => setCategory(col.name)}
-          >
-            {col.name}
+        <div className="shop-filters">
+          <button className={`filter-pill ${!category && !onSaleOnly ? 'is-active' : ''}`} onClick={() => setCategory('')}>
+            All
           </button>
-        ))}
+          {sale?.is_active && (
+            <button className={`filter-pill filter-pill-sale ${onSaleOnly ? 'is-active' : ''}`} onClick={showSale}>
+              Sale
+            </button>
+          )}
+          {collections.map((col) => (
+            <button
+              key={col.id}
+              className={`filter-pill ${category === col.name ? 'is-active' : ''}`}
+              onClick={() => setCategory(col.name)}
+            >
+              {col.name}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {(sizeOptions.length > 0 || colorOptions.length > 0) && (
-        <div className="shop-refine">
+      {filtering && (
+        <div className="active-filters">
+          {size && (
+            <button className="active-chip" onClick={() => toggleParam('size', size, size)} aria-label={`Remove age ${size}`}>
+              Age {size} <X size={13} />
+            </button>
+          )}
+          {color && (
+            <button className="active-chip" onClick={() => toggleParam('color', color, color)} aria-label={`Remove colour ${color}`}>
+              <span className="color-swatch" style={{ background: palette.find((c) => c.name === color)?.hex || '#ccc' }} />
+              {color} <X size={13} />
+            </button>
+          )}
+          <button className="color-clear" onClick={clearFilters}>Clear all</button>
+        </div>
+      )}
+
+      <div className={`filter-backdrop ${filterOpen ? 'is-open' : ''}`} onClick={() => setFilterOpen(false)} />
+      <aside
+        className={`filter-drawer ${filterOpen ? 'is-open' : ''}`}
+        role="dialog"
+        aria-label="Filters"
+        aria-hidden={!filterOpen}
+        inert={!filterOpen}
+      >
+        <div className="filter-drawer-head">
+          <h2>Filter</h2>
+          <button className="filter-drawer-close" onClick={() => setFilterOpen(false)} aria-label="Close filters">
+            <X size={22} />
+          </button>
+        </div>
+
+        <div className="filter-drawer-body">
+          <p className="filter-drawer-note">Showing only what's in stock right now.</p>
+
           {sizeOptions.length > 0 && (
-            <div className="shop-refine-row">
-              <span className="shop-refine-label">Age</span>
-              <div className="shop-age-list">
+            <section className="filter-group">
+              <h3>Age</h3>
+              <div className="filter-options">
                 {sizeOptions.map((s) => (
                   <button
                     key={s.label}
                     className={`age-pill ${size === s.label ? 'is-active' : ''}`}
                     onClick={() => toggleParam('size', s.label, size)}
                     aria-pressed={size === s.label}
-                    title={`${s.count} in stock in ${s.label}`}
                   >
                     {s.label}
                     <span className="age-pill-count">{s.count}</span>
                   </button>
                 ))}
               </div>
-            </div>
+            </section>
           )}
 
           {colorOptions.length > 0 && (
-            <div className="shop-refine-row">
-              <span className="shop-refine-label">Colour</span>
-              <div className="shop-color-list">
+            <section className="filter-group">
+              <h3>Colour</h3>
+              <div className="filter-options">
                 {colorOptions.map((c) => (
                   <button
                     key={c.name}
-                    className={`color-dot ${color === c.name ? 'is-active' : ''}`}
+                    className={`color-chip ${color === c.name ? 'is-active' : ''}`}
                     onClick={() => toggleParam('color', c.name, color)}
-                    aria-label={`Filter by ${c.name}`}
                     aria-pressed={color === c.name}
-                    title={`${c.name} · ${c.count} in stock`}
                   >
                     <span className="color-swatch" style={{ background: c.hex }} />
+                    {c.name}
+                    <span className="age-pill-count">{c.count}</span>
                   </button>
                 ))}
               </div>
-            </div>
-          )}
-
-          {filtering && (
-            <button className="color-clear" onClick={clearFilters}>
-              {[size, color].filter(Boolean).join(' · ')} — Clear filters
-            </button>
+            </section>
           )}
         </div>
-      )}
+
+        <div className="filter-drawer-foot">
+          <button className="btn btn-secondary" onClick={clearFilters} disabled={!filtering}>
+            Clear all
+          </button>
+          <button className="btn btn-primary" onClick={() => setFilterOpen(false)}>
+            Show {visible.length} {visible.length === 1 ? 'piece' : 'pieces'}
+          </button>
+        </div>
+      </aside>
 
       {loading ? (
         <p className="shop-empty">Loading products…</p>

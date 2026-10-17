@@ -40,11 +40,28 @@
   color: var(--text);
 }
 
+.shop-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
 .shop-filters {
   display: flex;
-  flex-wrap: wrap;
   gap: 10px;
-  margin-bottom: 28px;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.shop-filters::-webkit-scrollbar {
+  display: none;
+}
+
+.filter-pill {
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .filter-pill {
@@ -80,119 +97,205 @@
   padding: 60px 0;
 }
 
-.shop-refine {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 14px;
-  margin: -12px 0 28px;
-}
-
-.shop-refine-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-  min-width: 0;
-}
-
-.shop-refine-label {
+.filter-button {
   flex-shrink: 0;
-  width: 56px;
-  font-size: 1.2rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1.5px solid var(--brown);
+  background: var(--bg-elev);
+  color: var(--brown);
   font-weight: 700;
-  color: var(--taupe);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  font-size: 1.3rem;
 }
 
-.shop-age-list,
-.shop-color-list {
+.filter-button.is-active {
+  background: var(--honey-tint);
+  border-color: var(--honey);
+}
+
+.filter-button-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--honey);
+  color: #fff;
+  font-size: 1.1rem;
+}
+
+.active-filters {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
-  min-width: 0;
+  margin: -4px 0 22px;
 }
 
-.age-pill {
+.active-chip {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 12px;
+  padding: 5px 10px 5px 12px;
+  border-radius: 999px;
+  border: 1.5px solid var(--honey);
+  background: var(--honey-tint);
+  color: var(--dark-brown);
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.active-chip .color-swatch {
+  width: 14px;
+  height: 14px;
+}
+
+/* The slide-in filter panel --------------------------------------------- */
+.filter-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 59;
+  background: rgba(43, 31, 25, 0.45);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.filter-backdrop.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.filter-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 60;
+  width: min(88vw, 400px);
+  display: flex;
+  flex-direction: column;
+  background: var(--cream);
+  border-left: 1.5px solid var(--border);
+  box-shadow: -8px 0 24px rgba(43, 31, 25, 0.12);
+  transform: translateX(100%);
+  visibility: hidden;
+  transition: transform 0.28s var(--ease), visibility 0s linear 0.28s;
+}
+
+.filter-drawer.is-open {
+  transform: translateX(0);
+  visibility: visible;
+  transition: transform 0.28s var(--ease), visibility 0s;
+}
+
+.filter-drawer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 22px;
+  border-bottom: 1.5px solid var(--border);
+}
+
+.filter-drawer-head h2 {
+  font-size: 2.2rem;
+}
+
+.filter-drawer-close {
+  display: inline-flex;
+  padding: 4px;
+  background: none;
+  border: none;
+  color: var(--brown);
+}
+
+.filter-drawer-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 18px 22px 8px;
+}
+
+.filter-drawer-note {
+  margin-bottom: 18px;
+  font-size: 1.25rem;
+  color: var(--text-muted);
+}
+
+.filter-group {
+  margin-bottom: 26px;
+}
+
+.filter-group h3 {
+  margin-bottom: 12px;
+  font-size: 1.3rem;
+  font-family: var(--font-sans);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--taupe);
+}
+
+.filter-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.filter-drawer-foot {
+  display: flex;
+  gap: 10px;
+  padding: 14px 22px calc(14px + env(safe-area-inset-bottom));
+  border-top: 1.5px solid var(--border);
+  background: var(--cream);
+}
+
+.filter-drawer-foot .btn {
+  flex: 1;
+  white-space: nowrap;
+  padding-left: 14px;
+  padding-right: 14px;
+}
+
+.filter-drawer-foot .btn-primary {
+  flex: 2;
+}
+
+.age-pill,
+.color-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
   border-radius: 999px;
   border: 1.5px solid var(--border);
   background: var(--bg-elev);
   color: var(--brown);
   font-weight: 700;
-  font-size: 1.25rem;
+  font-size: 1.3rem;
   white-space: nowrap;
 }
 
 .age-pill-count {
   font-weight: 600;
-  font-size: 1.05rem;
+  font-size: 1.1rem;
   color: var(--text-muted);
 }
 
-.age-pill.is-active {
+.age-pill.is-active,
+.color-chip.is-active {
   background: var(--brown);
   border-color: var(--brown);
   color: #fff;
 }
 
-.age-pill.is-active .age-pill-count {
+.age-pill.is-active .age-pill-count,
+.color-chip.is-active .age-pill-count {
   color: rgba(255, 255, 255, 0.75);
-}
-
-@media (max-width: 640px) {
-  .shop-refine-row {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-  }
-
-  /* Ages scroll sideways on phones instead of taking up half the screen. */
-  .shop-age-list {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    width: calc(100% + 24px);
-    margin-right: -24px;
-    padding-right: 24px;
-    padding-bottom: 4px;
-    scrollbar-width: none;
-  }
-
-  .shop-age-list::-webkit-scrollbar {
-    display: none;
-  }
-}
-
-.color-dot {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 34px;
-  height: 34px;
-  padding: 0;
-  border-radius: 50%;
-  border: 1.5px solid var(--border);
-  background: var(--bg-elev);
-  transition: transform 0.15s var(--ease), border-color 0.15s var(--ease);
-}
-
-.color-dot .color-swatch {
-  width: 22px;
-  height: 22px;
-}
-
-.color-dot:hover {
-  transform: scale(1.08);
-}
-
-.color-dot.is-active {
-  border-color: var(--brown);
-  box-shadow: 0 0 0 1.5px var(--brown);
 }
 
 .color-clear {
