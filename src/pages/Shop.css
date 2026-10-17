@@ -80,21 +80,92 @@
   padding: 60px 0;
 }
 
-.shop-color-filter {
+.shop-refine {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
   margin: -12px 0 28px;
 }
 
-.shop-color-label {
-  font-size: 1.3rem;
+.shop-refine-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-width: 0;
+}
+
+.shop-refine-label {
+  flex-shrink: 0;
+  width: 56px;
+  font-size: 1.2rem;
   font-weight: 700;
   color: var(--taupe);
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  margin-right: 2px;
+}
+
+.shop-age-list,
+.shop-color-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.age-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1.5px solid var(--border);
+  background: var(--bg-elev);
+  color: var(--brown);
+  font-weight: 700;
+  font-size: 1.25rem;
+  white-space: nowrap;
+}
+
+.age-pill-count {
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: var(--text-muted);
+}
+
+.age-pill.is-active {
+  background: var(--brown);
+  border-color: var(--brown);
+  color: #fff;
+}
+
+.age-pill.is-active .age-pill-count {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+@media (max-width: 640px) {
+  .shop-refine-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  /* Ages scroll sideways on phones instead of taking up half the screen. */
+  .shop-age-list {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    width: calc(100% + 24px);
+    margin-right: -24px;
+    padding-right: 24px;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+
+  .shop-age-list::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 .color-dot {

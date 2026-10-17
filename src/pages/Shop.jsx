@@ -1,37 +1,45 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { Search } from 'lucide-react'
 import { supabase } from '../lib/supabaseClient'
+import { sizeRank, totalStock } from '../lib/constants'
 import { useCollections } from '../hooks/useCollections'
 import { useColors } from '../hooks/useColors'
 import { useSale } from '../context/SaleContext'
 import ProductCard from '../components/ProductCard'
 import './Shop.css'
 
+const hasSizeInStock = (product, size) =>
+  (product.size_stock || []).some((s) => s.size === size && Number(s.stock) > 0)
+
 export default function Shop() {
   const [searchParams, setSearchParams] = useSearchParams()
   const category = searchParams.get('category') || ''
   const onSaleOnly = searchParams.get('sale') === '1'
   const color = searchParams.get('color') || ''
+  const size = searchParams.get('size') || ''
   const { sale } = useSale()
   const [query, setQuery] = useState(searchParams.get('q') || '')
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
-  const [usedNames, setUsedNames] = useState([])
+  const [available, setAvailable] = useState([])
   const { palette } = useColors()
   const { collections } = useCollections()
 
-  // Only offer colours that at least one live product actually has. If the
-  // database has no colours column yet this errors and the filter just hides.
+  // What is actually in stock across the whole shop, used to offer only the
+  // colours and ages that have something to buy. If the database has no
+  // colours column yet, fall back to ages only.
   useEffect(() => {
-    supabase
-      .from('products')
-      .select('colors')
-      .eq('is_active', true)
-      .then(({ data, error }) => {
-        if (error) return
-        setUsedNames([...new Set((data || []).flatMap((p) => p.colors || []))])
-      })
+    let active = true
+    const load = async () => {
+      let { data, error } = await supabase.from('products').select('colors, size_stock').eq('is_active', true)
+      if (error) ({ data } = await supabase.from('products').select('size_stock').eq('is_active', true))
+      if (active) setAvailable(data || [])
+    }
+    load()
+    return () => {
+      active = false
+    }
   }, [])
 
   useEffect(() => {
@@ -58,7 +66,42 @@ export default function Shop() {
     }
   }, [category, onSaleOnly, color, searchParams])
 
-  const usedColors = palette.filter((c) => usedNames.includes(c.name))
+  // Colours and ages that have stock, with how many products each.
+  const { colorOptions, sizeOptions } = useMemo(() => {
+    const colorCounts = {}
+    const sizeCounts = {}
+    available.forEach((p) => {
+      if (totalStock(p.size_stock) > 0) {
+        ;(p.colors || []).forEach((name) => {
+          colorCounts[name] = (colorCounts[name] || 0) + 1
+        })
+      }
+      new Set((p.size_stock || []).filter((s) => Number(s.stock) > 0).map((s) => s.size)).forEach((label) => {
+        sizeCounts[label] = (sizeCounts[label] || 0) + 1
+      })
+    })
+    return {
+      colorOptions: palette.filter((c) => colorCounts[c.name]).map((c) => ({ ...c, count: colorCounts[c.name] })),
+      sizeOptions: Object.entries(sizeCounts)
+        .map(([label, count]) => ({ label, count }))
+        .sort((a, b) => {
+          const ra = sizeRank(a.label)
+          const rb = sizeRank(b.label)
+          return ra === rb ? 0 : ra < rb ? -1 : 1
+        }),
+    }
+  }, [available, palette])
+
+  // Picking an age or a colour means "show me what I can buy": the list keeps
+  // only products that are in stock in that age, or in stock at all for a colour.
+  const filtering = Boolean(size || color)
+  const visible = useMemo(
+    () =>
+      products.filter(
+        (p) => (!size || hasSizeInStock(p, size)) && (!color || totalStock(p.size_stock) > 0)
+      ),
+    [products, size, color]
+  )
 
   const handleSearch = (e) => {
     e.preventDefault()
@@ -76,10 +119,17 @@ export default function Shop() {
     setSearchParams(next)
   }
 
-  const setColor = (name) => {
+  const toggleParam = (key, value, current) => {
     const next = new URLSearchParams(searchParams)
-    if (name && name !== color) next.set('color', name)
-    else next.delete('color')
+    if (value && value !== current) next.set(key, value)
+    else next.delete(key)
+    setSearchParams(next)
+  }
+
+  const clearFilters = () => {
+    const next = new URLSearchParams(searchParams)
+    next.delete('color')
+    next.delete('size')
     setSearchParams(next)
   }
 
@@ -97,7 +147,8 @@ export default function Shop() {
           <h1>Shop All</h1>
           {!loading && (
             <p className="shop-header-sub">
-              {products.length} {products.length === 1 ? 'piece' : 'pieces'} · sized 1 to 14 years
+              {visible.length} {visible.length === 1 ? 'piece' : 'pieces'}
+              {filtering ? ' in stock' : ''} · sized 1 to 14 years
             </p>
           )}
         </div>
@@ -132,24 +183,51 @@ export default function Shop() {
         ))}
       </div>
 
-      {usedColors.length > 0 && (
-        <div className="shop-color-filter">
-          <span className="shop-color-label">Colour</span>
-          {usedColors.map((c) => (
-            <button
-              key={c.name}
-              className={`color-dot ${color === c.name ? 'is-active' : ''}`}
-              onClick={() => setColor(c.name)}
-              aria-label={`Filter by ${c.name}`}
-              aria-pressed={color === c.name}
-              title={c.name}
-            >
-              <span className="color-swatch" style={{ background: c.hex }} />
-            </button>
-          ))}
-          {color && (
-            <button className="color-clear" onClick={() => setColor('')}>
-              {color} · Clear
+      {(sizeOptions.length > 0 || colorOptions.length > 0) && (
+        <div className="shop-refine">
+          {sizeOptions.length > 0 && (
+            <div className="shop-refine-row">
+              <span className="shop-refine-label">Age</span>
+              <div className="shop-age-list">
+                {sizeOptions.map((s) => (
+                  <button
+                    key={s.label}
+                    className={`age-pill ${size === s.label ? 'is-active' : ''}`}
+                    onClick={() => toggleParam('size', s.label, size)}
+                    aria-pressed={size === s.label}
+                    title={`${s.count} in stock in ${s.label}`}
+                  >
+                    {s.label}
+                    <span className="age-pill-count">{s.count}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {colorOptions.length > 0 && (
+            <div className="shop-refine-row">
+              <span className="shop-refine-label">Colour</span>
+              <div className="shop-color-list">
+                {colorOptions.map((c) => (
+                  <button
+                    key={c.name}
+                    className={`color-dot ${color === c.name ? 'is-active' : ''}`}
+                    onClick={() => toggleParam('color', c.name, color)}
+                    aria-label={`Filter by ${c.name}`}
+                    aria-pressed={color === c.name}
+                    title={`${c.name} · ${c.count} in stock`}
+                  >
+                    <span className="color-swatch" style={{ background: c.hex }} />
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {filtering && (
+            <button className="color-clear" onClick={clearFilters}>
+              {[size, color].filter(Boolean).join(' · ')} — Clear filters
             </button>
           )}
         </div>
@@ -157,11 +235,21 @@ export default function Shop() {
 
       {loading ? (
         <p className="shop-empty">Loading products…</p>
-      ) : products.length === 0 ? (
-        <p className="shop-empty">No products found. Try a different search or category.</p>
+      ) : visible.length === 0 ? (
+        <p className="shop-empty">
+          {filtering
+            ? 'Nothing is in stock for that choice right now. Try another age or colour.'
+            : 'No products found. Try a different search or category.'}
+          {filtering && (
+            <>
+              <br />
+              <button className="color-clear" onClick={clearFilters}>Clear filters</button>
+            </>
+          )}
+        </p>
       ) : (
         <div className="product-grid">
-          {products.map((p) => (
+          {visible.map((p) => (
             <ProductCard key={p.id} product={p} />
           ))}
         </div>

@@ -38,6 +38,7 @@ export default function Navbar() {
   }, [])
 
   return (
+    <>
     <header className={`navbar ${hidden && !open ? 'navbar-hidden' : ''}`}>
       <div className="container navbar-inner">
         <Link to="/" className="navbar-logo" onClick={() => setOpen(false)}>
@@ -80,7 +81,10 @@ export default function Navbar() {
           </button>
         </div>
       </div>
+    </header>
 
+      {/* Outside the header: a transformed (hidden) header would otherwise
+          become the reference box for these fixed-position pieces. */}
       <div className={`navbar-drawer-backdrop ${open ? 'is-open' : ''}`} onClick={() => setOpen(false)} />
       <nav className={`navbar-mobile ${open ? 'is-open' : ''}`} aria-label="Mobile">
         <button
@@ -108,6 +112,6 @@ export default function Navbar() {
           {user ? 'My account' : 'Sign in'}
         </NavLink>
       </nav>
-    </header>
+    </>
   )
 }
