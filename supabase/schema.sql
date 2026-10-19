@@ -434,3 +434,93 @@ create policy "Shoppers manage their own bag" on carts
   for all to authenticated
   using (user_id = auth.uid())
   with check (user_id = auth.uid());
+
+-- Visitor tracking -----------------------------------------------------------
+-- One small row each time someone visits or opens/adds a product. No names,
+-- emails or IP addresses: visitor_id is a random code the browser makes up,
+-- only used to count unique visitors. Anyone can add a row (that is how the
+-- website records it); only the admin can read them.
+
+create table if not exists site_events (
+  id bigint generated always as identity primary key,
+  created_at timestamptz not null default now(),
+  type text not null check (type in ('visit', 'page_view', 'product_view', 'add_to_cart')),
+  visitor_id text not null check (char_length(visitor_id) between 8 and 64),
+  path text check (char_length(path) <= 300),
+  product_id uuid
+);
+
+create index if not exists site_events_created_idx on site_events (created_at desc);
+create index if not exists site_events_product_idx on site_events (product_id) where product_id is not null;
+
+alter table site_events enable row level security;
+
+drop policy if exists "Anyone can record an event" on site_events;
+create policy "Anyone can record an event" on site_events
+  for insert to anon, authenticated with check (true);
+
+drop policy if exists "Admins can read events" on site_events;
+create policy "Admins can read events" on site_events
+  for select to authenticated using (is_admin());
+
+-- The numbers the admin Analytics page shows, worked out in the database so
+-- they stay correct no matter how many events there are. Days are counted in
+-- Beirut time.
+create or replace function site_analytics(p_days int default 30)
+returns jsonb
+language plpgsql
+security definer
+stable
+set search_path = public
+as $$
+declare
+  since timestamptz := now() - make_interval(days => greatest(1, least(coalesce(p_days, 30), 365)));
+  totals jsonb;
+begin
+  if not is_admin() then
+    raise exception 'not allowed';
+  end if;
+
+  select jsonb_build_object(
+    'visits', count(*) filter (where type = 'visit'),
+    'visitors', count(distinct visitor_id),
+    'page_views', count(*) filter (where type = 'page_view'),
+    'product_views', count(*) filter (where type = 'product_view'),
+    'add_to_cart', count(*) filter (where type = 'add_to_cart')
+  ) into totals
+  from site_events
+  where created_at >= since;
+
+  return totals || jsonb_build_object(
+    'by_day', (
+      select coalesce(jsonb_agg(d order by d.day), '[]'::jsonb)
+      from (
+        select (created_at at time zone 'Asia/Beirut')::date as day,
+               count(*) filter (where type = 'visit') as visits,
+               count(*) filter (where type = 'page_view') as views
+        from site_events
+        where created_at >= since
+        group by 1
+      ) d
+    ),
+    'top_products', (
+      select coalesce(jsonb_agg(t order by t.views desc, t.adds desc), '[]'::jsonb)
+      from (
+        select e.product_id,
+               coalesce(p.name, 'Deleted product') as name,
+               p.images[1] as image,
+               count(*) filter (where e.type = 'product_view') as views,
+               count(*) filter (where e.type = 'add_to_cart') as adds
+        from site_events e
+        left join products p on p.id = e.product_id
+        where e.created_at >= since and e.product_id is not null
+        group by e.product_id, p.name, p.images[1]
+        order by views desc, adds desc
+        limit 10
+      ) t
+    )
+  );
+end;
+$$;
+
+grant execute on function site_analytics(int) to authenticated;

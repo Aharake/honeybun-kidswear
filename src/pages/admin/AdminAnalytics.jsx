@@ -4,6 +4,7 @@ import { supabase } from '../../lib/supabaseClient'
 import { getPricing } from '../../lib/pricing'
 import { totalStock } from '../../lib/constants'
 import { useSale } from '../../context/SaleContext'
+import VisitorStats from './VisitorStats'
 import './Admin.css'
 
 const CHART_COLOR = '#E0972C'
@@ -110,6 +111,8 @@ export default function AdminAnalytics() {
   return (
     <div>
       <h1>Analytics</h1>
+
+      <VisitorStats />
 
       <h2 className="admin-section-title">Stock on hand</h2>
       <div className="admin-stat-grid">

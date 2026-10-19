@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { track } from '../lib/track'
 import { Link } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
 import { useSale } from '../context/SaleContext'
@@ -32,6 +33,7 @@ export default function ProductCard({ product }) {
     e.stopPropagation()
     if (!nextSize) return
     addItem(product, { size: nextSize.size, qty: 1, price: pricing.current })
+    track('add_to_cart', { productId: product.id })
     setAdded(true)
     setTimeout(() => setAdded(false), 1500)
   }

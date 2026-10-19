@@ -728,3 +728,38 @@
   background: var(--honey-tint);
   border: 1.5px solid var(--honey);
 }
+
+.admin-range {
+  display: inline-flex;
+  gap: 6px;
+}
+
+.admin-range button {
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1.5px solid var(--border);
+  background: var(--bg-elev);
+  color: var(--brown);
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.admin-range button.is-active {
+  background: var(--brown);
+  border-color: var(--brown);
+  color: #fff;
+}
+
+.admin-rank {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  margin-right: 6px;
+  border-radius: 50%;
+  background: var(--honey-tint);
+  color: var(--honey-hover);
+  font-size: 1.1rem;
+  font-weight: 800;
+}

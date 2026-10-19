@@ -8,6 +8,7 @@ import { getPricing } from '../lib/pricing'
 import { sortSizeStock, totalStock } from '../lib/constants'
 import { useColors } from '../hooks/useColors'
 import { POLICY_SHORT } from '../lib/policy'
+import { track } from '../lib/track'
 import ImageCarousel from '../components/ImageCarousel'
 import './ProductDetail.css'
 
@@ -35,6 +36,7 @@ export default function ProductDetail() {
       .then(({ data }) => {
         if (!active) return
         setProduct(data)
+        if (data) track('product_view', { productId: data.id, path: `/product/${data.slug}` })
         const sizeStock = sortSizeStock(data?.size_stock)
         const firstInStock = sizeStock.find((s) => s.stock > 0)
         setSize((firstInStock || sizeStock[0])?.size || '')
@@ -78,6 +80,7 @@ export default function ProductDetail() {
   const handleAddToCart = () => {
     if (!canAdd) return
     addItem(product, { size, qty: shownQty, price: pricing.current })
+    track('add_to_cart', { productId: product.id })
     setQty(1)
     setAdded(true)
     setTimeout(() => setAdded(false), 1800)

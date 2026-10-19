@@ -5,6 +5,7 @@ import { SaleProvider } from './context/SaleContext'
 import Layout from './components/Layout'
 import ProtectedRoute from './components/ProtectedRoute'
 import ScrollToTop from './components/ScrollToTop'
+import Tracker from './components/Tracker'
 
 import Home from './pages/Home'
 import Shop from './pages/Shop'
@@ -35,6 +36,7 @@ function App() {
     <BrowserRouter>
       <ScrollToTop />
       <AuthProvider>
+        <Tracker />
         <CartProvider>
           <SaleProvider>
           <Routes>
