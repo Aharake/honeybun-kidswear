@@ -5,6 +5,7 @@ import { getPricing } from '../../lib/pricing'
 import { totalStock } from '../../lib/constants'
 import { useSale } from '../../context/SaleContext'
 import VisitorStats from './VisitorStats'
+import SalesTotals from './SalesTotals'
 import './Admin.css'
 
 const CHART_COLOR = '#E0972C'
@@ -114,6 +115,8 @@ export default function AdminAnalytics() {
 
       <VisitorStats />
 
+      <SalesTotals orders={orders} />
+
       <h2 className="admin-section-title">Stock on hand</h2>
       <div className="admin-stat-grid">
         <div className="admin-stat-card admin-stat-card-featured">
@@ -208,10 +211,6 @@ export default function AdminAnalytics() {
       <h2 className="admin-section-title">Sales</h2>
       <div className="admin-stat-grid">
         <div className="admin-stat-card">
-          <p className="admin-stat-label">Total revenue</p>
-          <p className="admin-stat-value">${stats.revenue.toFixed(2)}</p>
-        </div>
-        <div className="admin-stat-card">
           <p className="admin-stat-label">Total orders</p>
           <p className="admin-stat-value">{stats.orderCount}</p>
         </div>
@@ -226,7 +225,7 @@ export default function AdminAnalytics() {
       </div>
 
       <div className="admin-chart-card">
-        <h2>Revenue — last 14 days</h2>
+        <h2>Sales per day, with delivery — last 14 days</h2>
         <ResponsiveContainer width="100%" height={260}>
           <LineChart data={stats.revenueByDay}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--light-gray)" />
