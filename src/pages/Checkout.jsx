@@ -9,7 +9,7 @@ import './Checkout.css'
 const EMPTY_FORM = { customer_name: '', email: '', phone: '', address: '', city: '', notes: '' }
 
 export default function Checkout() {
-  const { items, subtotal, discount, discountAmount, total, removeCode, clearCart, checkStock } = useCart()
+  const { items, subtotal, discount, discountAmount, deliveryFee, total, removeCode, clearCart, checkStock } = useCart()
   const navigate = useNavigate()
   const { user, accountsReady } = useAuth()
   const [form, setForm] = useState(EMPTY_FORM)
@@ -188,6 +188,10 @@ export default function Checkout() {
               <span>−${discountAmount.toFixed(2)}</span>
             </div>
           )}
+          <div className="checkout-summary-row">
+            <span>Delivery</span>
+            <span>${deliveryFee.toFixed(2)}</span>
+          </div>
           <div className="checkout-summary-total">
             <span>Total</span>
             <span>${total.toFixed(2)}</span>

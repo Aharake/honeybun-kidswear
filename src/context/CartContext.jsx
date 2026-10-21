@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { useAuth } from './AuthContext'
-import { discountAmountFor, round2 } from '../lib/pricing'
+import { DELIVERY_FEE, discountAmountFor, round2 } from '../lib/pricing'
 
 const CartContext = createContext(null)
 const STORAGE_KEY = 'honeybun_cart'
@@ -226,7 +226,8 @@ export function CartProvider({ children }) {
   const subtotal = useMemo(() => round2(items.reduce((sum, i) => sum + i.price * i.qty, 0)), [items])
   const totalCount = useMemo(() => items.reduce((sum, i) => sum + i.qty, 0), [items])
   const discountAmount = useMemo(() => discountAmountFor(discount, subtotal), [discount, subtotal])
-  const total = round2(subtotal - discountAmount)
+  const deliveryFee = items.length > 0 ? DELIVERY_FEE : 0
+  const total = round2(subtotal - discountAmount + deliveryFee)
 
   const applyCode = async (code) => {
     const { data, error } = await supabase.rpc('validate_discount_code', {
@@ -260,6 +261,7 @@ export function CartProvider({ children }) {
     totalCount,
     discount,
     discountAmount,
+    deliveryFee,
     total,
     applyCode,
     removeCode,

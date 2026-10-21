@@ -34,6 +34,10 @@ const esc = (value) =>
 
 const money = (n) => `$${Number(n || 0).toFixed(2)}`
 
+// Delivery fee = whatever the total has on top of the goods minus any discount.
+const deliveryFee = (order) =>
+  Math.max(0, Math.round((Number(order.total) - (Number(order.subtotal) - Number(order.discount_amount || 0))) * 100) / 100)
+
 export function renderCustomerEmail(order) {
   const items = Array.isArray(order.items) ? order.items : []
   const rows = items
@@ -56,6 +60,14 @@ export function renderCustomerEmail(order) {
       ? `<tr>
           <td style="padding:10px 0;color:${BROWN};font-size:15px;">Discount${order.discount_code ? ` (${esc(order.discount_code)})` : ''}</td>
           <td style="padding:10px 0;color:${BROWN};font-size:15px;text-align:right;">−${money(order.discount_amount)}</td>
+        </tr>`
+      : ''
+
+  const delivery =
+    deliveryFee(order) > 0
+      ? `<tr>
+          <td style="padding:10px 0;color:${BROWN};font-size:15px;">Delivery</td>
+          <td style="padding:10px 0;color:${BROWN};font-size:15px;text-align:right;">${money(deliveryFee(order))}</td>
         </tr>`
       : ''
 
@@ -83,6 +95,7 @@ export function renderCustomerEmail(order) {
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
               ${rows}
               ${discount}
+              ${delivery}
               <tr>
                 <td style="padding:14px 0 0;color:${BROWN};font-size:17px;font-weight:bold;">Total (cash on delivery)</td>
                 <td style="padding:14px 0 0;color:${HONEY};font-size:17px;font-weight:bold;text-align:right;">${money(order.total)}</td>
@@ -115,6 +128,7 @@ export function renderCustomerEmail(order) {
     '',
     ...items.map((i) => `- ${i.name}${i.size ? ` (${i.size})` : ''} x ${i.qty}: ${money(Number(i.price) * Number(i.qty))}`),
     Number(order.discount_amount) > 0 ? `Discount: -${money(order.discount_amount)}` : '',
+    deliveryFee(order) > 0 ? `Delivery: ${money(deliveryFee(order))}` : '',
     `Total (cash on delivery): ${money(order.total)}`,
     '',
     `Delivering to: ${order.address}, ${order.city}`,

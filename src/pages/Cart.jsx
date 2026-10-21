@@ -6,7 +6,7 @@ import './Cart.css'
 
 export default function Cart() {
   const {
-    items, removeItem, updateQty, subtotal, discount, discountAmount, total,
+    items, removeItem, updateQty, subtotal, discount, discountAmount, deliveryFee, total,
     applyCode, removeCode, stockNotice, dismissStockNotice,
   } = useCart()
 
@@ -120,11 +120,15 @@ export default function Cart() {
               <span>−${discountAmount.toFixed(2)}</span>
             </div>
           )}
+          <div className="cart-summary-line">
+            <span>Delivery</span>
+            <span>${deliveryFee.toFixed(2)}</span>
+          </div>
           <div className="cart-summary-row">
             <span>Total</span>
             <span>${total.toFixed(2)}</span>
           </div>
-          <p className="cart-summary-note">Shipping and payment (cash on delivery) confirmed at checkout.</p>
+          <p className="cart-summary-note">Payment is cash on delivery, confirmed at checkout.</p>
           <Link to="/checkout" className="btn btn-primary cart-checkout-btn">Proceed to checkout →</Link>
         </div>
       </div>

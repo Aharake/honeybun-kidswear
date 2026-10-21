@@ -1,4 +1,5 @@
 import { Fragment, useEffect, useState } from 'react'
+import { orderDeliveryFee } from '../../lib/pricing'
 import { supabase } from '../../lib/supabaseClient'
 import './Admin.css'
 
@@ -76,6 +77,9 @@ export default function AdminOrders() {
                       {o.notes && <p><strong>Notes:</strong> {o.notes}</p>}
                       {o.discount_amount > 0 && (
                         <p><strong>Discount:</strong> {o.discount_code} (−${Number(o.discount_amount).toFixed(2)})</p>
+                      )}
+                      {orderDeliveryFee(o) > 0 && (
+                        <p><strong>Delivery fee:</strong> ${orderDeliveryFee(o).toFixed(2)} (included in the total)</p>
                       )}
                       <p style={{ marginTop: 8 }}><strong>Items:</strong></p>
                       <ul>

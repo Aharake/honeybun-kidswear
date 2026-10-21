@@ -1,5 +1,16 @@
 const round2 = (n) => Math.round(n * 100) / 100
 
+// Flat delivery fee added to every order. Change it here.
+export const DELIVERY_FEE = 5
+
+// What a saved order was charged for delivery: whatever its total has on top
+// of the goods minus any discount. Orders from before the fee came out as 0, so
+// nothing needs to be stored separately.
+export function orderDeliveryFee(order) {
+  const goods = Number(order.subtotal) - Number(order.discount_amount || 0)
+  return round2(Math.max(0, Number(order.total) - goods))
+}
+
 export function salePriceFor(product, percentOff) {
   const override = product.sale_price
   if (override !== null && override !== undefined && override !== '') return Number(override)

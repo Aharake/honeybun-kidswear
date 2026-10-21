@@ -1,6 +1,7 @@
 import { Link, useLocation, useParams } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { POLICY_SHORT } from '../lib/policy'
+import { orderDeliveryFee } from '../lib/pricing'
 import { CheckCircle2 } from 'lucide-react'
 import './OrderConfirmation.css'
 
@@ -35,6 +36,12 @@ export default function OrderConfirmation() {
               <div className="checkout-summary-row">
                 <span>Discount ({order.discount_code})</span>
                 <span>−${Number(order.discount_amount).toFixed(2)}</span>
+              </div>
+            )}
+            {orderDeliveryFee(order) > 0 && (
+              <div className="checkout-summary-row">
+                <span>Delivery</span>
+                <span>${orderDeliveryFee(order).toFixed(2)}</span>
               </div>
             )}
             <div className="checkout-summary-total">
