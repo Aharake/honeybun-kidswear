@@ -11,6 +11,8 @@
     "start": "serve -s dist"
   },
   "dependencies": {
+    "@fontsource-variable/baloo-2": "^5.3.0",
+    "@fontsource-variable/nunito": "^5.3.0",
     "@supabase/supabase-js": "^2.109.0",
     "lucide-react": "^1.46.0",
     "react": "19.2.8",

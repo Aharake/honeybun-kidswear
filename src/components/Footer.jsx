@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useCollections } from '../hooks/useCollections'
 import { INSTAGRAM_LINK, WHATSAPP_LINK } from '../lib/contact'
-import logo from '../assets/logo.png'
+import logo from '../assets/logo.webp'
 import './Footer.css'
 
 export default function Footer() {

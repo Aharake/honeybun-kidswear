@@ -3,7 +3,7 @@ import { Link, NavLink } from 'react-router-dom'
 import { Menu, X, ShoppingBag, User } from 'lucide-react'
 import { useCart } from '../context/CartContext'
 import { useAuth } from '../context/AuthContext'
-import logo from '../assets/logo.png'
+import logo from '../assets/logo.webp'
 import './Navbar.css'
 
 const LINKS = [

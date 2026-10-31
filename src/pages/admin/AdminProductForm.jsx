@@ -5,6 +5,7 @@ import { supabase, slugify, PRODUCT_IMAGES_BUCKET } from '../../lib/supabaseClie
 import { SIZE_OPTIONS, sortSizeStock } from '../../lib/constants'
 import { useColors } from '../../hooks/useColors'
 import { getAdjust, isAdjusted } from '../../lib/imageAdjust'
+import { resizeImage, uploadName } from '../../lib/resizeImage'
 import PhotoAdjuster from '../../components/PhotoAdjuster'
 import './Admin.css'
 
@@ -194,8 +195,10 @@ export default function AdminProductForm() {
 
     const uploaded = []
     for (const file of files) {
-      const path = `${form.slug || 'product'}/${Date.now()}-${file.name}`
-      const { error: uploadError } = await supabase.storage.from(PRODUCT_IMAGES_BUCKET).upload(path, file)
+      const blob = await resizeImage(file)
+      const { name, contentType } = uploadName(file, blob)
+      const path = `${form.slug || 'product'}/${name}`
+      const { error: uploadError } = await supabase.storage.from(PRODUCT_IMAGES_BUCKET).upload(path, blob, { contentType })
       if (uploadError) {
         setError(`Failed to upload ${file.name}: ${uploadError.message}`)
         continue

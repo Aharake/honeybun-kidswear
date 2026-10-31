@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { X } from 'lucide-react'
 import { supabase, slugify, PRODUCT_IMAGES_BUCKET } from '../../lib/supabaseClient'
 import { collectionImage } from '../../lib/collectionImages'
+import { resizeImage, uploadName } from '../../lib/resizeImage'
 import './Admin.css'
 
 const EMPTY = { name: '', slug: '', tagline: '', image_url: '', sort_order: 0, is_active: true, show_on_home: true, hasHomeColumn: false }
@@ -52,8 +53,10 @@ export default function AdminCollectionForm() {
     if (!file) return
     setUploading(true)
     setError('')
-    const path = `collections/${form.slug || 'collection'}-${Date.now()}-${file.name}`
-    const { error: uploadError } = await supabase.storage.from(PRODUCT_IMAGES_BUCKET).upload(path, file)
+    const blob = await resizeImage(file)
+    const { name, contentType } = uploadName(file, blob)
+    const path = `collections/${form.slug || 'collection'}-${name}`
+    const { error: uploadError } = await supabase.storage.from(PRODUCT_IMAGES_BUCKET).upload(path, blob, { contentType })
     if (uploadError) {
       setError(`Failed to upload image: ${uploadError.message}`)
     } else {

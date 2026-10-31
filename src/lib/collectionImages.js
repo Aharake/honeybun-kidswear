@@ -1,6 +1,6 @@
-import newbornImage from '../assets/categories/newborn.jpg'
-import girlsImage from '../assets/categories/girls.jpg'
-import boysImage from '../assets/categories/boys.jpg'
+import newbornImage from '../assets/categories/newborn.webp'
+import girlsImage from '../assets/categories/girls.webp'
+import boysImage from '../assets/categories/boys.webp'
 
 const BUNDLED = { newborn: newbornImage, girls: girlsImage, boys: boysImage }
 

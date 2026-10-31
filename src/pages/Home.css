@@ -319,3 +319,49 @@
     font-size: 5.2rem;
   }
 }
+
+/* Placeholders that hold the space while the shop's data loads, so the page
+   doesn't jump when the real cards arrive. */
+.category-card-skeleton,
+.product-skeleton-image {
+  background: linear-gradient(90deg, var(--warm-beige) 0%, var(--cream) 50%, var(--warm-beige) 100%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
+
+.category-card-skeleton {
+  box-shadow: none;
+}
+
+.product-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.product-skeleton-image {
+  aspect-ratio: 3 / 4;
+  border-radius: var(--radius-md);
+}
+
+.product-skeleton-line {
+  height: 14px;
+  border-radius: 8px;
+  background: var(--warm-beige);
+}
+
+.product-skeleton-line.is-short {
+  width: 55%;
+}
+
+@keyframes skeleton-shimmer {
+  from { background-position: 100% 0; }
+  to { background-position: -100% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .category-card-skeleton,
+  .product-skeleton-image {
+    animation: none;
+  }
+}

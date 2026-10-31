@@ -763,3 +763,33 @@
   font-size: 1.1rem;
   font-weight: 800;
 }
+
+.admin-optimizer {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 16px 18px;
+  margin-bottom: 20px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-elev);
+}
+
+.admin-optimizer-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--honey-tint);
+  color: var(--honey-hover);
+}
+
+.admin-optimizer-title {
+  margin-bottom: 4px;
+  font-weight: 800;
+  font-size: 1.5rem;
+  color: var(--dark-brown);
+}

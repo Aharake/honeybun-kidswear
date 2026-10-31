@@ -5,6 +5,19 @@
     <link rel="icon" type="image/png" href="/favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Honeybun Kidswear</title>
+    <meta name="description" content="Sweet, comfy kidswear for little ones, sized 1 to 14 years. Cash on delivery." />
+    <meta name="theme-color" content="#FFF9F4" />
+    <!-- Start the connection to the shop's database and photos right away -->
+    <link rel="preconnect" href="https://sarmqglowwdnaalbindd.supabase.co" crossorigin />
+    <!-- The big hero photo is what people see first, so fetch it before the app code even runs -->
+    <link
+      rel="preload"
+      as="image"
+      href="/hero-800.webp"
+      imagesrcset="/hero-800.webp 800w, /hero-1600.webp 1600w"
+      imagesizes="100vw"
+      fetchpriority="high"
+    />
   </head>
   <body>
     <div id="root"></div>

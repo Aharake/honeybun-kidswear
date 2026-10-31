@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
-import logo from '../../assets/logo.png'
+import logo from '../../assets/logo.webp'
 import './Admin.css'
 
 export default function AdminLogin() {

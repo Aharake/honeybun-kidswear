@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { Pencil, Trash2, Plus } from 'lucide-react'
 import { supabase } from '../../lib/supabaseClient'
 import { totalStock } from '../../lib/constants'
+import PhotoOptimizer from '../../components/PhotoOptimizer'
 import './Admin.css'
 
 export default function AdminProducts() {
@@ -44,6 +45,8 @@ export default function AdminProducts() {
           </Link>
         </div>
       </div>
+
+      {!loading && products.length > 0 && <PhotoOptimizer products={products} onDone={load} />}
 
       {loading ? (
         <p>Loading…</p>

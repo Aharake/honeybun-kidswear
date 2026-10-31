@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import heroImage from '../assets/hero.jpg'
 import { supabase } from '../lib/supabaseClient'
 import { collectionImage } from '../lib/collectionImages'
 import { useCollections } from '../hooks/useCollections'
@@ -60,7 +59,7 @@ function NewsletterSignup() {
 export default function Home() {
   const [featured, setFeatured] = useState([])
   const [loading, setLoading] = useState(true)
-  const { collections: allCollections } = useCollections()
+  const { collections: allCollections, loading: collectionsLoading } = useCollections()
   const collections = allCollections.filter((c) => c.show_on_home !== false)
   const { sale, maxPercent } = useSale()
 
@@ -95,7 +94,17 @@ export default function Home() {
       )}
 
       <section className="hero-photo">
-        <img src={heroImage} alt="" className="hero-photo-bg" />
+        <img
+          src="/hero-800.webp"
+          srcSet="/hero-800.webp 800w, /hero-1600.webp 1600w"
+          sizes="100vw"
+          width="1600"
+          height="901"
+          alt=""
+          className="hero-photo-bg"
+          fetchPriority="high"
+          decoding="async"
+        />
         <div className="hero-photo-scrim" />
         <div className="hero-photo-content">
           <p className="hero-eyebrow hero-anim" style={{ animationDelay: '0ms' }}>NEW SEASON IS HERE</p>
@@ -114,13 +123,20 @@ export default function Home() {
       </section>
 
       <div className="container">
-        {collections.length > 0 && (
+        {(collectionsLoading || collections.length > 0) && (
           <section className="category-showcase">
             <Reveal className="section-intro">
               <p className="hero-eyebrow">EXPLORE THE COLLECTION</p>
               <h2>Shop by collection</h2>
               <p className="section-intro-sub">Pick a collection and find something sweet for your little one.</p>
             </Reveal>
+            {collectionsLoading ? (
+              <div className="category-showcase-grid" style={{ '--cols': 3 }} aria-hidden="true">
+                {[0, 1, 2].map((i) => (
+                  <div key={i} className="category-card category-card-skeleton" />
+                ))}
+              </div>
+            ) : (
             <StaggerGroup
               className="category-showcase-grid"
               style={{ '--cols': Math.min(collections.length, 4) }}
@@ -130,7 +146,7 @@ export default function Home() {
                 return (
                   <Link key={col.id} to={`/shop?category=${encodeURIComponent(col.name)}`} className="category-card">
                     {image ? (
-                      <img src={image} alt="" className="category-card-image" />
+                      <img src={image} alt="" className="category-card-image" loading="lazy" decoding="async" />
                     ) : (
                       <div className="category-card-image category-card-fallback">{col.name.charAt(0)}</div>
                     )}
@@ -146,13 +162,22 @@ export default function Home() {
                 )
               })}
             </StaggerGroup>
+            )}
           </section>
         )}
 
         <Reveal className="home-featured" id="freshly-added">
           <h2>Freshly added</h2>
           {loading ? (
-            <p className="home-empty">Loading products…</p>
+            <div className="product-grid" aria-hidden="true">
+              {[0, 1, 2, 3].map((i) => (
+                <div key={i} className="product-skeleton">
+                  <div className="product-skeleton-image" />
+                  <div className="product-skeleton-line" />
+                  <div className="product-skeleton-line is-short" />
+                </div>
+              ))}
+            </div>
           ) : featured.length === 0 ? (
             <p className="home-empty">No products yet — check back soon!</p>
           ) : (
