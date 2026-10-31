@@ -296,7 +296,15 @@ export default function Shop() {
       </aside>
 
       {loading ? (
-        <p className="shop-empty">Loading products…</p>
+        <div className="product-grid" aria-hidden="true">
+          {Array.from({ length: 8 }, (_, i) => (
+            <div key={i} className="product-skeleton">
+              <div className="product-skeleton-image" />
+              <div className="product-skeleton-line" />
+              <div className="product-skeleton-line is-short" />
+            </div>
+          ))}
+        </div>
       ) : visible.length === 0 ? (
         <p className="shop-empty">
           {filtering
@@ -311,8 +319,8 @@ export default function Shop() {
         </p>
       ) : (
         <div className="product-grid">
-          {visible.map((p) => (
-            <ProductCard key={p.id} product={p} />
+          {visible.map((p, i) => (
+            <ProductCard key={p.id} product={p} eager={i < 4} />
           ))}
         </div>
       )}

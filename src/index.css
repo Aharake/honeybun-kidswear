@@ -13,6 +13,7 @@ html {
 
   --honey-tint: #FBF0DA;
   --taupe: #C9B8A7;
+  --taupe-text: #7A6655; /* taupe that is dark enough to read as text */
   --sage-green: #B7C4A7;
   --lavender: #DCCDEB;
   --sky-blue: #D6E8F6;
@@ -23,7 +24,7 @@ html {
   --off-white: #F8F8F8;
 
   --honey: #E0972C;
-  --honey-hover: #C67F1F;
+  --honey-hover: #A5600B;
   --blue-gray: #8FA8C9;
   --mustard: #F3D9A6;
   --sage: #96B48F;
@@ -33,7 +34,7 @@ html {
   --bg-soft: var(--honey-tint);
   --border: var(--light-gray);
   --text: var(--dark-brown);
-  --text-muted: var(--gray);
+  --text-muted: #6B6B6B;
   --text-on-accent: #FFFFFF;
 
   --font-display: 'Baloo 2 Variable', 'Nunito Variable', system-ui, sans-serif;

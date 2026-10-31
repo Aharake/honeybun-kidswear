@@ -46,7 +46,7 @@
 }
 
 .product-card-badge-sale {
-  background: var(--honey);
+  background: var(--honey-hover);
 }
 
 .product-card-oos {
@@ -68,7 +68,7 @@
 .product-card-category {
   font-size: 1.1rem;
   font-weight: 600;
-  color: var(--taupe);
+  color: var(--taupe-text);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }

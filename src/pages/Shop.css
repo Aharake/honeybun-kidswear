@@ -86,8 +86,8 @@
 }
 
 .filter-pill-sale.is-active {
-  background: var(--honey);
-  border-color: var(--honey);
+  background: var(--honey-hover);
+  border-color: var(--honey-hover);
   color: #fff;
 }
 
@@ -124,7 +124,7 @@
   height: 20px;
   padding: 0 5px;
   border-radius: 999px;
-  background: var(--honey);
+  background: var(--honey-hover);
   color: #fff;
   font-size: 1.1rem;
 }
@@ -237,7 +237,7 @@
   font-weight: 800;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--taupe);
+  color: var(--taupe-text);
 }
 
 .filter-options {

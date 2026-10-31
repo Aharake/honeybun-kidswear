@@ -78,7 +78,7 @@
   position: absolute;
   top: -8px;
   right: -10px;
-  background: var(--honey);
+  background: var(--honey-hover);
   color: #fff;
   font-size: 1rem;
   font-weight: 700;

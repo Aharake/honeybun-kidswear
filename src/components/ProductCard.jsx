@@ -8,7 +8,7 @@ import { sortSizeStock, totalStock } from '../lib/constants'
 import { adjustStyle, getAdjust } from '../lib/imageAdjust'
 import './ProductCard.css'
 
-export default function ProductCard({ product }) {
+export default function ProductCard({ product, eager = false }) {
   const { addItem, qtyInCart } = useCart()
   const { sale } = useSale()
   const [added, setAdded] = useState(false)
@@ -45,7 +45,9 @@ export default function ProductCard({ product }) {
           <img
             src={image}
             alt={product.name}
-            loading="lazy"
+            loading={eager ? 'eager' : 'lazy'}
+            fetchPriority={eager ? 'high' : undefined}
+            decoding="async"
             style={adjustStyle(getAdjust(product.image_adjust, image))}
           />
         ) : (

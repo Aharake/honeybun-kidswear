@@ -1,0 +1,9 @@
+# Honeybun Kidswear
+
+> Sweet, comfy kidswear for little ones, sized 1 to 14 years. Payment is cash on delivery.
+
+## Pages
+
+- [Shop](https://www.honeybun.online/shop): every product, filterable by age and colour
+- [Contact](https://www.honeybun.online/contact): WhatsApp and Instagram
+- [Exchange policy](https://www.honeybun.online/exchanges): no refunds, exchanges within 7 days of delivery

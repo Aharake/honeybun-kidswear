@@ -42,7 +42,7 @@ export default function Navbar() {
     <header className={`navbar ${hidden && !open ? 'navbar-hidden' : ''}`}>
       <div className="container navbar-inner">
         <Link to="/" className="navbar-logo" onClick={() => setOpen(false)}>
-          <img src={logo} alt="Honeybun Kidswear" />
+          <img src={logo} alt="Honeybun Kidswear" width="300" height="203" />
         </Link>
 
         <nav className="navbar-links-desktop" aria-label="Primary">
