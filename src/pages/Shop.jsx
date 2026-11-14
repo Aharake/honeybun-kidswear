@@ -7,6 +7,8 @@ import { useCollections } from '../hooks/useCollections'
 import { useColors } from '../hooks/useColors'
 import { useSale } from '../context/SaleContext'
 import ProductCard from '../components/ProductCard'
+import SeasonBanner from '../components/SeasonBanner'
+import { useSeasonal } from '../hooks/useSeasonal'
 import './Shop.css'
 
 const hasSizeInStock = (product, size) =>
@@ -18,6 +20,7 @@ export default function Shop() {
   const onSaleOnly = searchParams.get('sale') === '1'
   const color = searchParams.get('color') || ''
   const size = searchParams.get('size') || ''
+  const season = searchParams.get('collection') || ''
   const { sale } = useSale()
   const [query, setQuery] = useState(searchParams.get('q') || '')
   const [products, setProducts] = useState([])
@@ -26,6 +29,8 @@ export default function Shop() {
   const [filterOpen, setFilterOpen] = useState(false)
   const { palette } = useColors()
   const { collections } = useCollections()
+  const { seasonal } = useSeasonal()
+  const activeSeason = seasonal.find((s) => s.slug === season)
 
   // What is actually in stock across the whole shop, used to offer only the
   // colours and ages that have something to buy. If the database has no
@@ -50,6 +55,7 @@ export default function Shop() {
     let request = supabase.from('products').select('*').eq('is_active', true)
     if (category) request = request.eq('category', category)
     if (color) request = request.contains('colors', [color])
+    if (season) request = request.contains('seasonal_collections', [season])
     if (onSaleOnly) request = request.or('on_sale.eq.true,product_sale_price.not.is.null')
     const q = searchParams.get('q')
     if (q) request = request.or(`name.ilike.%${q}%,description.ilike.%${q}%`)
@@ -65,7 +71,7 @@ export default function Shop() {
     return () => {
       active = false
     }
-  }, [category, onSaleOnly, color, searchParams])
+  }, [category, onSaleOnly, color, season, searchParams])
 
   // Colours and ages that have stock, with how many products each.
   const { colorOptions, sizeOptions } = useMemo(() => {
@@ -128,7 +134,10 @@ export default function Shop() {
   const setCategory = (cat) => {
     const next = new URLSearchParams(searchParams)
     if (cat) next.set('category', cat)
-    else next.delete('category')
+    else {
+      next.delete('category')
+      next.delete('collection')
+    }
     next.delete('sale')
     setSearchParams(next)
   }
@@ -190,7 +199,7 @@ export default function Shop() {
           </button>
         )}
         <div className="shop-filters">
-          <button className={`filter-pill ${!category && !onSaleOnly ? 'is-active' : ''}`} onClick={() => setCategory('')}>
+          <button className={`filter-pill ${!category && !onSaleOnly && !season ? 'is-active' : ''}`} onClick={() => setCategory('')}>
             All
           </button>
           {sale?.is_active && (
@@ -207,8 +216,20 @@ export default function Shop() {
               {col.name}
             </button>
           ))}
+          {seasonal.map((s) => (
+            <button
+              key={s.id}
+              className={`filter-pill filter-pill-season ${season === s.slug ? 'is-active' : ''}`}
+              onClick={() => toggleParam('collection', s.slug, season)}
+              aria-pressed={season === s.slug}
+            >
+              {s.name}
+            </button>
+          ))}
         </div>
       </div>
+
+      {activeSeason && <SeasonBanner collection={activeSeason} compact />}
 
       {filtering && (
         <div className="active-filters">

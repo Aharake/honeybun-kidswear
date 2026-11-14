@@ -306,3 +306,14 @@
   font-size: 1.25rem;
   padding: 4px 6px;
 }
+
+/* Seasonal collection pills (like Winter) sit with the others but stand out a little */
+.filter-pill-season {
+  border-color: var(--honey);
+  background: var(--honey-tint);
+}
+
+.filter-pill-season.is-active {
+  background: var(--brown);
+  border-color: var(--brown);
+}

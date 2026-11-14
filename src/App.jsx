@@ -27,6 +27,8 @@ const AdminProductForm = lazy(() => import('./pages/admin/AdminProductForm'))
 const AdminCollections = lazy(() => import('./pages/admin/AdminCollections'))
 const AdminCollectionForm = lazy(() => import('./pages/admin/AdminCollectionForm'))
 const AdminBulkAdd = lazy(() => import('./pages/admin/AdminBulkAdd'))
+const AdminSeasonal = lazy(() => import('./pages/admin/AdminSeasonal'))
+const AdminSeasonalForm = lazy(() => import('./pages/admin/AdminSeasonalForm'))
 const AdminSale = lazy(() => import('./pages/admin/AdminSale'))
 const AdminDiscounts = lazy(() => import('./pages/admin/AdminDiscounts'))
 const AdminOrders = lazy(() => import('./pages/admin/AdminOrders'))
@@ -89,6 +91,9 @@ function App() {
               <Route path="collections" element={<AdminCollections />} />
               <Route path="collections/new" element={<AdminCollectionForm />} />
               <Route path="collections/:id/edit" element={<AdminCollectionForm />} />
+              <Route path="seasonal" element={<AdminSeasonal />} />
+              <Route path="seasonal/new" element={<AdminSeasonalForm />} />
+              <Route path="seasonal/:id/edit" element={<AdminSeasonalForm />} />
               <Route path="sale" element={<AdminSale />} />
               <Route path="discounts" element={<AdminDiscounts />} />
               <Route path="orders" element={<AdminOrders />} />

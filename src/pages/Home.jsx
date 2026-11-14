@@ -5,6 +5,8 @@ import { collectionImage } from '../lib/collectionImages'
 import { useCollections } from '../hooks/useCollections'
 import { useSale } from '../context/SaleContext'
 import SaleBanner from '../components/SaleBanner'
+import SeasonBanner, { SeasonBannerSkeleton } from '../components/SeasonBanner'
+import { hadBannerBefore, useSeasonal } from '../hooks/useSeasonal'
 import ProductCard from '../components/ProductCard'
 import Reveal, { StaggerGroup } from '../components/Reveal'
 import './Home.css'
@@ -62,6 +64,9 @@ export default function Home() {
   const { collections: allCollections, loading: collectionsLoading } = useCollections()
   const collections = allCollections.filter((c) => c.show_on_home !== false)
   const { sale, maxPercent } = useSale()
+  const { seasonal, loading: seasonalLoading } = useSeasonal()
+  const banners = seasonal.filter((s) => s.show_on_home).slice(0, 2)
+  const [expectBanner] = useState(hadBannerBefore)
 
   useEffect(() => {
     let active = true
@@ -123,6 +128,16 @@ export default function Home() {
       </section>
 
       <div className="container">
+        {(seasonalLoading ? expectBanner : banners.length > 0) && (
+          <div className="season-banners">
+            {seasonalLoading ? (
+              <SeasonBannerSkeleton />
+            ) : (
+              banners.map((b) => <SeasonBanner key={b.id} collection={b} />)
+            )}
+          </div>
+        )}
+
         {(collectionsLoading || collections.length > 0) && (
           <section className="category-showcase">
             <Reveal className="section-intro">

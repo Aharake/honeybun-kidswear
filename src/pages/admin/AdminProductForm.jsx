@@ -18,6 +18,7 @@ const EMPTY = {
   category: '',
   size_stock: [],
   colors: [],
+  seasonal_collections: [],
   images: [],
   image_adjust: {},
   is_active: true,
@@ -39,6 +40,7 @@ export default function AdminProductForm() {
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState('')
   const [collections, setCollections] = useState([])
+  const [seasonalList, setSeasonalList] = useState(null) // null until the database has them
   const [adjusting, setAdjusting] = useState(null)
   const [customSize, setCustomSize] = useState('')
   const [customError, setCustomError] = useState('')
@@ -57,6 +59,16 @@ export default function AdminProductForm() {
         const names = (data || []).map((c) => c.name)
         setCollections(names)
         setForm((f) => (f.category ? f : { ...f, category: names[0] || '' }))
+      })
+  }, [])
+
+  useEffect(() => {
+    supabase
+      .from('seasonal_collections')
+      .select('name, slug')
+      .order('sort_order', { ascending: true })
+      .then(({ data, error: seasonalError }) => {
+        if (!seasonalError) setSeasonalList(data || [])
       })
   }, [])
 
@@ -106,6 +118,15 @@ export default function AdminProductForm() {
         : sortSizeStock([...f.size_stock, { size, stock: 0 }])
       return { ...f, size_stock: next }
     })
+  }
+
+  const toggleSeasonal = (slug) => {
+    setForm((f) => ({
+      ...f,
+      seasonal_collections: f.seasonal_collections.includes(slug)
+        ? f.seasonal_collections.filter((s) => s !== slug)
+        : [...f.seasonal_collections, slug],
+    }))
   }
 
   const toggleColor = (name) => {
@@ -254,6 +275,7 @@ export default function AdminProductForm() {
       category: form.category,
       size_stock: form.size_stock,
       ...(form.colors.length > 0 || form.hasColorsColumn ? { colors: form.colors } : {}),
+      ...(seasonalList ? { seasonal_collections: form.seasonal_collections || [] } : {}),
       images: form.images,
       is_active: form.is_active,
       ...(form.saleOn || form.hasSaleColumn
@@ -381,6 +403,29 @@ export default function AdminProductForm() {
             <p className="admin-field-hint">Create a collection first under Collections in the sidebar.</p>
           )}
         </div>
+
+        {seasonalList && seasonalList.length > 0 && (
+          <div className="field">
+            <label>Seasonal collections</label>
+            <p className="admin-field-hint">
+              Optional. Tick any seasonal collection (like Winter) this product should also appear in. It stays in its
+              Girls or Boys collection either way.
+            </p>
+            <div className="admin-size-checks">
+              {seasonalList.map((s) => (
+                <button
+                  type="button"
+                  key={s.slug}
+                  className={`admin-size-check ${form.seasonal_collections.includes(s.slug) ? 'is-active' : ''}`}
+                  onClick={() => toggleSeasonal(s.slug)}
+                  aria-pressed={form.seasonal_collections.includes(s.slug)}
+                >
+                  {s.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="field">
           <label>Colour</label>

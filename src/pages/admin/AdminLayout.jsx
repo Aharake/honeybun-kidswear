@@ -6,6 +6,7 @@ import './Admin.css'
 const LINKS = [
   { to: '/admin/products', label: 'Products' },
   { to: '/admin/collections', label: 'Collections' },
+  { to: '/admin/seasonal', label: 'Seasonal collections' },
   { to: '/admin/sale', label: 'Sale' },
   { to: '/admin/discounts', label: 'Discount codes' },
   { to: '/admin/orders', label: 'Orders' },

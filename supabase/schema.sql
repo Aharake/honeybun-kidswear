@@ -524,3 +524,45 @@ end;
 $$;
 
 grant execute on function site_analytics(int) to authenticated;
+
+-- Seasonal collections ---------------------------------------------------------
+-- Extra groupings that cut across Girls / Boys, like "Winter". A product keeps
+-- its normal collection and can ALSO be in any number of these. Each can show
+-- a banner on the home page. Products store the slugs of the ones they are in.
+
+create table if not exists seasonal_collections (
+  id uuid primary key default gen_random_uuid(),
+  name text not null unique,
+  slug text not null unique,
+  tagline text not null default '',
+  banner_url text,
+  show_on_home boolean not null default true,
+  is_active boolean not null default true,
+  sort_order int not null default 0,
+  created_at timestamptz not null default now()
+);
+
+alter table seasonal_collections enable row level security;
+
+drop policy if exists "Public can read active seasonal collections" on seasonal_collections;
+create policy "Public can read active seasonal collections" on seasonal_collections
+  for select to anon, authenticated using (is_active = true);
+
+drop policy if exists "Admins can read all seasonal collections" on seasonal_collections;
+create policy "Admins can read all seasonal collections" on seasonal_collections
+  for select to authenticated using (is_admin());
+
+drop policy if exists "Admins can insert seasonal collections" on seasonal_collections;
+create policy "Admins can insert seasonal collections" on seasonal_collections
+  for insert to authenticated with check (is_admin());
+
+drop policy if exists "Admins can update seasonal collections" on seasonal_collections;
+create policy "Admins can update seasonal collections" on seasonal_collections
+  for update to authenticated using (is_admin());
+
+drop policy if exists "Admins can delete seasonal collections" on seasonal_collections;
+create policy "Admins can delete seasonal collections" on seasonal_collections
+  for delete to authenticated using (is_admin());
+
+alter table products add column if not exists seasonal_collections text[] not null default '{}'::text[];
+create index if not exists products_seasonal_collections_idx on products using gin (seasonal_collections);
