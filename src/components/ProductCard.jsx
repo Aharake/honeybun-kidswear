@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { track } from '../lib/track'
+import { pixelAddToCart } from '../lib/metaPixel'
 import { Link } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
 import { useSale } from '../context/SaleContext'
@@ -34,6 +35,7 @@ export default function ProductCard({ product, eager = false }) {
     if (!nextSize) return
     addItem(product, { size: nextSize.size, qty: 1, price: pricing.current })
     track('add_to_cart', { productId: product.id })
+    pixelAddToCart(product, pricing.current, 1)
     setAdded(true)
     setTimeout(() => setAdded(false), 1500)
   }

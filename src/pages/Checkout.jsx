@@ -3,6 +3,7 @@ import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
 import { useAuth } from '../context/AuthContext'
 import { POLICY_SHORT } from '../lib/policy'
+import { pixelInitiateCheckout, pixelPurchase } from '../lib/metaPixel'
 import { supabase, generateOrderNumber } from '../lib/supabaseClient'
 import './Checkout.css'
 
@@ -17,6 +18,14 @@ export default function Checkout() {
   const [error, setError] = useState('')
   const orderPlaced = useRef(false)
   const prefilled = useRef(null)
+  const startedCheckout = useRef(false)
+
+  // Tells Meta the shopper reached checkout (once per visit to this page).
+  useEffect(() => {
+    if (startedCheckout.current || items.length === 0) return
+    startedCheckout.current = true
+    pixelInitiateCheckout(items, total)
+  }, [items, total])
 
   // Signed in: fill in the form from the account and their last delivery,
   // without overwriting anything they've already typed.
@@ -114,6 +123,7 @@ export default function Checkout() {
       })
     }
 
+    pixelPurchase(orderPayload)
     orderPlaced.current = true
     clearCart()
     navigate(`/order-confirmation/${orderPayload.order_number}`, { state: { order: orderPayload } })
