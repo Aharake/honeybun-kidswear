@@ -1,10 +1,12 @@
 // Meta (Facebook / Instagram) Pixel. It tells your Meta Ads account what
 // visitors do on the shop so ads can be measured and retargeted.
 //
-// It stays completely off until a Pixel ID is set: add VITE_META_PIXEL_ID in
-// Railway -> Variables (the number from Meta Events Manager), then redeploy.
 
-export const PIXEL_ID = (import.meta.env.VITE_META_PIXEL_ID || '').trim()
+// A Pixel ID is public (it is visible in any site's page source), so it lives here.
+// VITE_META_PIXEL_ID in Railway overrides it; set it to 'off' to switch tracking off.
+const DEFAULT_PIXEL_ID = '1834640344528155'
+const fromEnv = (import.meta.env.VITE_META_PIXEL_ID || '').trim()
+export const PIXEL_ID = fromEnv.toLowerCase() === 'off' ? '' : fromEnv || DEFAULT_PIXEL_ID
 const CURRENCY = 'USD'
 
 let started = false
