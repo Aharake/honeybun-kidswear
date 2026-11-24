@@ -566,3 +566,39 @@ create policy "Admins can delete seasonal collections" on seasonal_collections
 
 alter table products add column if not exists seasonal_collections text[] not null default '{}'::text[];
 create index if not exists products_seasonal_collections_idx on products using gin (seasonal_collections);
+
+-- Tracking & ads settings ------------------------------------------------------
+-- The Meta Pixel / Google Analytics / Google Tag Manager IDs, edited by the admin
+-- under "Tracking & ads". The IDs are public (they appear in the page source of
+-- any site that uses them), so shoppers' browsers can read them; only admins can
+-- change them. The format check also means nothing but a real ID can be stored,
+-- since these values end up in script addresses.
+
+create table if not exists site_settings (
+  key text primary key,
+  value text not null default '',
+  updated_at timestamptz not null default now(),
+  constraint site_settings_valid check (
+    (key = 'meta_pixel_id' and value ~ '^([0-9]{10,20})?$') or
+    (key = 'ga4_id' and value ~ '^(G-[A-Z0-9]{6,14})?$') or
+    (key = 'gtm_id' and value ~ '^(GTM-[A-Z0-9]{4,10})?$')
+  )
+);
+
+alter table site_settings enable row level security;
+
+drop policy if exists "Anyone can read site settings" on site_settings;
+create policy "Anyone can read site settings" on site_settings
+  for select to anon, authenticated using (true);
+
+drop policy if exists "Admins can add site settings" on site_settings;
+create policy "Admins can add site settings" on site_settings
+  for insert to authenticated with check (is_admin());
+
+drop policy if exists "Admins can change site settings" on site_settings;
+create policy "Admins can change site settings" on site_settings
+  for update to authenticated using (is_admin()) with check (is_admin());
+
+drop policy if exists "Admins can remove site settings" on site_settings;
+create policy "Admins can remove site settings" on site_settings
+  for delete to authenticated using (is_admin());

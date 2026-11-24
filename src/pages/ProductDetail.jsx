@@ -9,7 +9,7 @@ import { sortSizeStock, totalStock } from '../lib/constants'
 import { useColors } from '../hooks/useColors'
 import { POLICY_SHORT } from '../lib/policy'
 import { track } from '../lib/track'
-import { pixelAddToCart, pixelViewContent } from '../lib/metaPixel'
+import { adAddToCart, adViewItem } from '../lib/marketing'
 import ImageCarousel from '../components/ImageCarousel'
 import './ProductDetail.css'
 
@@ -39,7 +39,7 @@ export default function ProductDetail() {
         setProduct(data)
         if (data) {
           track('product_view', { productId: data.id, path: `/product/${data.slug}` })
-          pixelViewContent(data)
+          adViewItem(data)
         }
         const sizeStock = sortSizeStock(data?.size_stock)
         const firstInStock = sizeStock.find((s) => s.stock > 0)
@@ -85,7 +85,7 @@ export default function ProductDetail() {
     if (!canAdd) return
     addItem(product, { size, qty: shownQty, price: pricing.current })
     track('add_to_cart', { productId: product.id })
-    pixelAddToCart(product, pricing.current, shownQty)
+    adAddToCart(product, pricing.current, shownQty)
     setQty(1)
     setAdded(true)
     setTimeout(() => setAdded(false), 1800)

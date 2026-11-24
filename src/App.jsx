@@ -33,6 +33,7 @@ const AdminSale = lazy(() => import('./pages/admin/AdminSale'))
 const AdminDiscounts = lazy(() => import('./pages/admin/AdminDiscounts'))
 const AdminOrders = lazy(() => import('./pages/admin/AdminOrders'))
 const AdminAnalytics = lazy(() => import('./pages/admin/AdminAnalytics'))
+const AdminTracking = lazy(() => import('./pages/admin/AdminTracking'))
 
 // Only the home page is in the first download. Every other page (and the whole
 // admin area with its charts) loads when someone opens it.
@@ -98,6 +99,7 @@ function App() {
               <Route path="discounts" element={<AdminDiscounts />} />
               <Route path="orders" element={<AdminOrders />} />
               <Route path="analytics" element={<AdminAnalytics />} />
+              <Route path="tracking" element={<AdminTracking />} />
             </Route>
           </Routes>
           </Suspense>

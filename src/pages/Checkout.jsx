@@ -3,7 +3,7 @@ import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
 import { useAuth } from '../context/AuthContext'
 import { POLICY_SHORT } from '../lib/policy'
-import { pixelInitiateCheckout, pixelPurchase } from '../lib/metaPixel'
+import { adBeginCheckout, adPurchase } from '../lib/marketing'
 import { supabase, generateOrderNumber } from '../lib/supabaseClient'
 import './Checkout.css'
 
@@ -24,7 +24,7 @@ export default function Checkout() {
   useEffect(() => {
     if (startedCheckout.current || items.length === 0) return
     startedCheckout.current = true
-    pixelInitiateCheckout(items, total)
+    adBeginCheckout(items, total)
   }, [items, total])
 
   // Signed in: fill in the form from the account and their last delivery,
@@ -123,7 +123,7 @@ export default function Checkout() {
       })
     }
 
-    pixelPurchase(orderPayload)
+    adPurchase(orderPayload)
     orderPlaced.current = true
     clearCart()
     navigate(`/order-confirmation/${orderPayload.order_number}`, { state: { order: orderPayload } })

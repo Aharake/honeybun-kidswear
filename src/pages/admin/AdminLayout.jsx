@@ -11,6 +11,7 @@ const LINKS = [
   { to: '/admin/discounts', label: 'Discount codes' },
   { to: '/admin/orders', label: 'Orders' },
   { to: '/admin/analytics', label: 'Analytics' },
+  { to: '/admin/tracking', label: 'Tracking & ads' },
 ]
 
 export default function AdminLayout() {
